@@ -1,9 +1,10 @@
 ﻿using Common.DTOs;
 using Common.DTOs.Trip;
+using Microsoft.ServiceFabric.Services.Remoting;
 
 namespace Common.Interfaces
 {
-    public interface ITripService
+    public interface ITripService:IService
     {
         Task<ApiResponseDTO<TripResponseDTO>> CreateTripAsync(Guid userId, TripCreateDTO createDto);
         Task<ApiResponseDTO<TripResponseDTO>> GetTripByIdAsync(Guid tripId, Guid userId);

@@ -23,7 +23,7 @@ namespace TripPlanerAPI.Controllers
         {
             if (registerDto == null)
             {
-                return BadRequest(new LoginResponseDTO { Success = false, ErrorMessage = "Podaci za registraciju su prazni." });
+                return BadRequest(new LoginResponseDTO { Success = false, ErrorMessage = "Registration data is empty." });
             }
 
             try
@@ -32,17 +32,17 @@ namespace TripPlanerAPI.Controllers
 
                 if (!result.Success)
                 {
-                    return BadRequest(result); 
+                    return BadRequest(result);
                 }
 
-                return Ok(result); 
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new LoginResponseDTO
                 {
                     Success = false,
-                    ErrorMessage = $"Greška na API Gateway-u prilikom registracije: {ex.Message}"
+                    ErrorMessage = $"API Gateway error during registration: {ex.Message}"
                 });
             }
         }
@@ -53,7 +53,7 @@ namespace TripPlanerAPI.Controllers
         {
             if (loginDto == null)
             {
-                return BadRequest(new LoginResponseDTO { Success = false, ErrorMessage = "Podaci za prijavu su prazni." });
+                return BadRequest(new LoginResponseDTO { Success = false, ErrorMessage = "Login data is empty." });
             }
 
             try
@@ -62,17 +62,17 @@ namespace TripPlanerAPI.Controllers
 
                 if (!result.Success)
                 {
-                    return Unauthorized(result); 
+                    return Unauthorized(result);
                 }
 
-                return Ok(result); 
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new LoginResponseDTO
                 {
                     Success = false,
-                    ErrorMessage = $"Greška na API Gateway-u prilikom prijave: {ex.Message}"
+                    ErrorMessage = $"API Gateway error during login: {ex.Message}"
                 });
             }
         }

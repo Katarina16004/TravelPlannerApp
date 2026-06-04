@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserService.Data;
+using UserService.Mappers;
 using UserService.Models;
 
 namespace UserService.Services
@@ -186,12 +187,12 @@ namespace UserService.Services
                     };
                 }
 
-                var userResponse = MapToUserResponseDTO(user);
+                var userResponseDTO = UserMapper.MapToResponseDto(user);
 
                 return new ApiResponseDTO<UserResponseDTO>
                 {
                     Success = true,
-                    Data = userResponse,
+                    Data = userResponseDTO,
                     Message = "User retrieved successfully."
                 };
             }
@@ -210,13 +211,13 @@ namespace UserService.Services
             try
             {
                 var users = await _context.Users.ToListAsync();
-                var userResponses = users.Select(MapToUserResponseDTO).ToList();
+                var userResponsesDtos = users.Select(UserMapper.MapToResponseDto).ToList();
 
                 return new ApiResponseDTO<List<UserResponseDTO>>
                 {
                     Success = true,
-                    Data = userResponses,
-                    Message = $"Found {userResponses.Count} users."
+                    Data = userResponsesDtos,
+                    Message = $"Found {userResponsesDtos.Count} users."
                 };
             }
             catch (Exception ex)
@@ -313,12 +314,12 @@ namespace UserService.Services
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
 
-                var userResponse = MapToUserResponseDTO(user);
+                var userResponseDTO = UserMapper.MapToResponseDto(user);
 
                 return new ApiResponseDTO<UserResponseDTO>
                 {
                     Success = true,
-                    Data = userResponse,
+                    Data = userResponseDTO,
                     Message = "User updated successfully."
                 };
             }
@@ -382,18 +383,6 @@ namespace UserService.Services
                 };
             }
         }
-
-        private UserResponseDTO MapToUserResponseDTO(User user)
-        {
-            return new UserResponseDTO
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Role = user.Role
-            };
-        }
-
         #endregion
     }
 }
