@@ -31,7 +31,7 @@ namespace TripService
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                string sqlConn = "Server=.\\SQLEXPRESS;Database=TravelPlanner_UserDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=False;";
+                string sqlConn = "Server=.\\SQLEXPRESS;Database=TravelPlanner_TripDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=False;";
 
                 var services = new ServiceCollection();
 
@@ -43,14 +43,13 @@ namespace TripService
 
                 _serviceProvider = services.BuildServiceProvider();
 
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    _tripBusinessService = scope.ServiceProvider.GetRequiredService<ITripService>();
-                }
+                _tripBusinessService = _serviceProvider.GetRequiredService<ITripService>();
+
+                ServiceEventSource.Current.ServiceMessage(this.Context, "TripService initialized successfully");
             }
             catch (Exception ex)
             {
-                ServiceEventSource.Current.ServiceMessage(context, $"TripService initialization failed: {ex.Message}");
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"Error: {ex.Message}");
                 throw;
             }
         }

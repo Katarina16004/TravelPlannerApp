@@ -77,7 +77,7 @@ namespace TripService.Services
                 return new ApiResponseDTO<TripResponseDTO>
                 {
                     Success = false,
-                    Message = $"Error creating trip: {ex.Message}"
+                    Message = $"Error creating trip: {ex.Message}-> Inner: {ex.InnerException?.Message}"
                 };
             }
         }
