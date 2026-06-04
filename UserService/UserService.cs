@@ -1,50 +1,74 @@
-using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Common.DTOs;
+using Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Fabric;
+using UserService.Data;
+using UserService.Services;
 
 namespace UserService
 {
-    /// <summary>
-    /// An instance of this class is created for each service instance by the Service Fabric runtime.
-    /// </summary>
-    internal sealed class UserService : StatelessService
+    internal sealed class UserService : StatelessService, IUserService
     {
+        private readonly ServiceProvider _serviceProvider;
+        private readonly IUserService _userBusinessService;
+
         public UserService(StatelessServiceContext context)
             : base(context)
-        { }
-
-        /// <summary>
-        /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
-        /// </summary>
-        /// <returns>A collection of listeners.</returns>
-        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            try
+            {
+                var configuration = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
+
+                string sqlConn = "Server=.\\SQLEXPRESS;Database=TravelPlanner_UserDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=False;";
+
+                var services = new ServiceCollection();
+
+                services.AddDbContext<UserDbContext>(options =>
+                    options.UseSqlServer(sqlConn));
+
+                services.AddSingleton<IConfiguration>(configuration);
+                services.AddScoped<IUserService, UserBusinessService>();
+
+                _serviceProvider = services.BuildServiceProvider();
+                _userBusinessService = _serviceProvider.GetRequiredService<IUserService>();
+
+                ServiceEventSource.Current.ServiceMessage(this.Context, "UserService initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"Error: {ex.Message}");
+                throw;
+            }
         }
 
-        /// <summary>
-        /// This is the main entry point for your service instance.
-        /// </summary>
-        /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
+        public Task<LoginResponseDTO> RegisterAsync(UserRegisterDTO registerDto)
+        {
+            return _userBusinessService.RegisterAsync(registerDto);
+        }
+
+        public Task<LoginResponseDTO> LoginAsync(UserLoginDTO loginDto)
+        {
+            return _userBusinessService.LoginAsync(loginDto);
+        }
+
+        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        {
+            return this.CreateServiceRemotingInstanceListeners();
+        }
+
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
-
-            long iterations = 0;
-
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
             }
         }
     }
