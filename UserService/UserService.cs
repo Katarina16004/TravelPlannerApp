@@ -1,4 +1,6 @@
 ﻿using Common.DTOs;
+using Common.DTOs.Auth;
+using Common.DTOs.User;
 using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -56,6 +58,25 @@ namespace UserService
         public Task<LoginResponseDTO> LoginAsync(UserLoginDTO loginDto)
         {
             return _userBusinessService.LoginAsync(loginDto);
+        }
+        public Task<ApiResponseDTO<UserResponseDTO>> GetUserByIdAsync(Guid userId)
+        {
+            return _userBusinessService.GetUserByIdAsync(userId);
+        }
+
+        public Task<ApiResponseDTO<List<UserResponseDTO>>> GetAllUsersAsync()
+        {
+            return _userBusinessService.GetAllUsersAsync();
+        }
+
+        public Task<ApiResponseDTO<UserResponseDTO>> UpdateUserAsync(Guid userId, UserUpdateDTO updateDto, Guid requestingUserId, string requestingUserRole)
+        {
+            return _userBusinessService.UpdateUserAsync(userId, updateDto, requestingUserId, requestingUserRole);
+        }
+
+        public Task<ApiResponseDTO<bool>> DeleteUserAsync(Guid userId, Guid requestingUserId, string requestingUserRole)
+        {
+            return _userBusinessService.DeleteUserAsync(userId, requestingUserId, requestingUserRole);
         }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()

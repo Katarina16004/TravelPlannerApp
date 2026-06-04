@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
-using Common.DTOs;     
-using Common.Interfaces; 
+using Common.Interfaces;
+using Common.DTOs.Auth;
 
 namespace TripPlanerAPI.Controllers
 {

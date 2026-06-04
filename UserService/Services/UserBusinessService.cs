@@ -1,4 +1,6 @@
 ﻿using Common.DTOs;
+using Common.DTOs.Auth;
+using Common.DTOs.User;
 using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,6 +21,7 @@ namespace UserService.Services
             _context = context;
         }
 
+        #region Auth
         public async Task<LoginResponseDTO> RegisterAsync(UserRegisterDTO registerDto)
         {
             try
@@ -164,5 +167,233 @@ namespace UserService.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+        #endregion
+
+        #region CRUD Operations
+
+        public async Task<ApiResponseDTO<UserResponseDTO>> GetUserByIdAsync(Guid userId)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    return new ApiResponseDTO<UserResponseDTO>
+                    {
+                        Success = false,
+                        Message = "User not found."
+                    };
+                }
+
+                var userResponse = MapToUserResponseDTO(user);
+
+                return new ApiResponseDTO<UserResponseDTO>
+                {
+                    Success = true,
+                    Data = userResponse,
+                    Message = "User retrieved successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseDTO<UserResponseDTO>
+                {
+                    Success = false,
+                    Message = $"Error retrieving user: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ApiResponseDTO<List<UserResponseDTO>>> GetAllUsersAsync()
+        {
+            try
+            {
+                var users = await _context.Users.ToListAsync();
+                var userResponses = users.Select(MapToUserResponseDTO).ToList();
+
+                return new ApiResponseDTO<List<UserResponseDTO>>
+                {
+                    Success = true,
+                    Data = userResponses,
+                    Message = $"Found {userResponses.Count} users."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseDTO<List<UserResponseDTO>>
+                {
+                    Success = false,
+                    Message = $"Error retrieving users: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ApiResponseDTO<UserResponseDTO>> UpdateUserAsync(Guid userId, UserUpdateDTO updateDto, Guid requestingUserId, string requestingUserRole)
+        {
+            try
+            {
+                if (requestingUserId != userId && requestingUserRole != "Admin")
+                {
+                    return new ApiResponseDTO<UserResponseDTO>
+                    {
+                        Success = false,
+                        Message = "You do not have permission to update this user."
+                    };
+                }
+
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null)
+                {
+                    return new ApiResponseDTO<UserResponseDTO>
+                    {
+                        Success = false,
+                        Message = "User not found."
+                    };
+                }
+
+                if (string.IsNullOrWhiteSpace(updateDto.Name) || string.IsNullOrWhiteSpace(updateDto.Email))
+                {
+                    return new ApiResponseDTO<UserResponseDTO>
+                    {
+                        Success = false,
+                        Message = "Name and email are required."
+                    };
+                }
+
+                if (updateDto.Email != user.Email)
+                {
+                    var existingUser = await _context.Users.AnyAsync(u => u.Email == updateDto.Email);
+                    if (existingUser)
+                    {
+                        return new ApiResponseDTO<UserResponseDTO>
+                        {
+                            Success = false,
+                            Message = "Email is already in use."
+                        };
+                    }
+                }
+
+                user.Name = updateDto.Name;
+                user.Email = updateDto.Email;
+
+                if (!string.IsNullOrWhiteSpace(updateDto.NewPassword))
+                {
+                    if (string.IsNullOrWhiteSpace(updateDto.CurrentPassword))
+                    {
+                        return new ApiResponseDTO<UserResponseDTO>
+                        {
+                            Success = false,
+                            Message = "Current password is required to change password."
+                        };
+                    }
+
+                    bool currentPasswordValid = BCrypt.Net.BCrypt.Verify(updateDto.CurrentPassword, user.PasswordHash);
+                    if (!currentPasswordValid)
+                    {
+                        return new ApiResponseDTO<UserResponseDTO>
+                        {
+                            Success = false,
+                            Message = "Current password is incorrect."
+                        };
+                    }
+
+                    if (updateDto.NewPassword.Length < 6)
+                    {
+                        return new ApiResponseDTO<UserResponseDTO>
+                        {
+                            Success = false,
+                            Message = "New password must have at least 6 characters."
+                        };
+                    }
+
+                    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateDto.NewPassword);
+                }
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                var userResponse = MapToUserResponseDTO(user);
+
+                return new ApiResponseDTO<UserResponseDTO>
+                {
+                    Success = true,
+                    Data = userResponse,
+                    Message = "User updated successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseDTO<UserResponseDTO>
+                {
+                    Success = false,
+                    Message = $"Error updating user: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ApiResponseDTO<bool>> DeleteUserAsync(Guid userId, Guid requestingUserId, string requestingUserRole)
+        {
+            try
+            {
+                if (requestingUserRole != "Admin")
+                {
+                    return new ApiResponseDTO<bool>
+                    {
+                        Success = false,
+                        Message = "You do not have permission to delete this user."
+                    };
+                }
+                if (userId == requestingUserId)
+                {
+                    return new ApiResponseDTO<bool>
+                    {
+                        Success = false,
+                        Message = "Admin cannot delete their own account."
+                    };
+                }
+
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null)
+                {
+                    return new ApiResponseDTO<bool>
+                    {
+                        Success = false,
+                        Message = "User not found."
+                    };
+                }
+
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+
+                return new ApiResponseDTO<bool>
+                {
+                    Success = true,
+                    Data = true,
+                    Message = "User deleted successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseDTO<bool>
+                {
+                    Success = false,
+                    Message = $"Error deleting user: {ex.Message}"
+                };
+            }
+        }
+
+        private UserResponseDTO MapToUserResponseDTO(User user)
+        {
+            return new UserResponseDTO
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role
+            };
+        }
+
+        #endregion
     }
 }
