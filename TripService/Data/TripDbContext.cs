@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Common.Enums;
+using Microsoft.EntityFrameworkCore;
 using TripService.Models;
 
 namespace TripService.Data
@@ -12,6 +13,7 @@ namespace TripService.Data
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Destination> Destinations { get; set; }
         public DbSet<Activity> Activities { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -69,6 +71,33 @@ namespace TripService.Data
                       .WithMany(d => d.Activities)
                       .HasForeignKey(a => a.DestinationId)
                       .OnDelete(DeleteBehavior.Cascade); // brise aktivnosti ako se obrise destinacija
+            });
+
+            modelBuilder.Entity<Expense>(entity =>
+            {
+                entity.ToTable("Expenses");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.Description).HasMaxLength(500);
+
+                entity.Property(e => e.Category)
+                      .HasConversion<string>()
+                      .HasMaxLength(50)
+                      .HasDefaultValue(ExpenseCategory.Other);
+
+                entity.Property(e => e.Currency).HasMaxLength(10).HasDefaultValue("EUR");
+                entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
+
+                entity.HasOne(e => e.Trip)
+                      .WithMany(t => t.Expenses)
+                      .HasForeignKey(e => e.TripId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Trip>(entity =>
+            {
+                entity.Property(t => t.Budget).HasColumnType("decimal(18,2)").HasDefaultValue(0.00m);
             });
         }
     }
