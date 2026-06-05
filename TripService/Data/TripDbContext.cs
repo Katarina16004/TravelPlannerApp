@@ -11,6 +11,7 @@ namespace TripService.Data
 
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Destination> Destinations { get; set; }
+        public DbSet<Activity> Activities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,6 +51,24 @@ namespace TripService.Data
                       .WithMany(t => t.Destinations)
                       .HasForeignKey(d => d.TripId)
                       .OnDelete(DeleteBehavior.Cascade); // brise destinacije ako se obrise Trip
+            });
+
+            modelBuilder.Entity<Activity>(entity =>
+            {
+                entity.ToTable("Activities");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.Description).HasMaxLength(500);
+                entity.Property(e => e.Location).HasMaxLength(200);
+                entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Planirano");
+                entity.Property(e => e.Cost).HasColumnType("decimal(18,2)").HasDefaultValue(0.00m);
+
+                // One-to-Many
+                entity.HasOne(a => a.Destination)
+                      .WithMany(d => d.Activities)
+                      .HasForeignKey(a => a.DestinationId)
+                      .OnDelete(DeleteBehavior.Cascade); // brise aktivnosti ako se obrise destinacija
             });
         }
     }

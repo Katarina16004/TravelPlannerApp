@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TripService.Models
+﻿namespace TripService.Models
 {
     public class Destination
     {
@@ -16,5 +10,7 @@ namespace TripService.Models
         public DateTime DepartureDate { get; set; }
         public string? Description { get; set; } 
         public Trip? Trip { get; set; }
+
+        public ICollection<Activity> Activities { get; set; } = new List<Activity>();
     }
 }
