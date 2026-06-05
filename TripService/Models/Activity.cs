@@ -1,4 +1,6 @@
-﻿namespace TripService.Models
+﻿using Common.Enums;
+
+namespace TripService.Models
 {
     public class Activity
     {
@@ -10,7 +12,7 @@
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public decimal Cost { get; set; }
-        public string Status { get; set; } = "Planned"; // Planned, Reserved, Completed, Canceled
+        public ActivityStatus Status { get; set; } = ActivityStatus.Planned;
         public Destination? Destination { get; set; }
     }
 }

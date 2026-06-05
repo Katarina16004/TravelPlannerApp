@@ -1,4 +1,6 @@
-﻿namespace Common.DTOs.Trip.Activity
+﻿using Common.Enums;
+
+namespace Common.DTOs.Trip.Activity
 {
     public class ActivityCreateDTO
     {
@@ -8,6 +10,6 @@
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public decimal Cost { get; set; }
-        public string Status { get; set; } = "Planned"; // Planned, Reserved, Completed, Canceled
+        public ActivityStatus Status { get; set; }
     }
 }

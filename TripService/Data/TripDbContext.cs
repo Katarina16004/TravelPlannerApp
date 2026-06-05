@@ -30,7 +30,7 @@ namespace TripService.Data
                 entity.Property(e => e.StartDate).IsRequired();
                 entity.Property(e => e.EndDate).IsRequired();
                 entity.Property(e => e.Budget).IsRequired().HasColumnType("decimal(10,2)");
-                entity.Property(e => e.Status).IsRequired();
+                entity.Property(t => t.Status);
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.Note).IsRequired(false);
 
@@ -63,7 +63,7 @@ namespace TripService.Data
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(150);
                 entity.Property(e => e.Description).HasMaxLength(500);
                 entity.Property(e => e.Location).HasMaxLength(200);
-                entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("Planirano");
+                entity.Property(a => a.Status);
                 entity.Property(e => e.Cost).HasColumnType("decimal(18,2)").HasDefaultValue(0.00m);
 
                 // One-to-Many

@@ -1,4 +1,6 @@
-﻿namespace Common.DTOs.Trip
+﻿using Common.Enums;
+
+namespace Common.DTOs.Trip
 {
     public class TripResponseDTO
     {
@@ -10,7 +12,7 @@
         public DateTime EndDate { get; set; }
         public decimal Budget { get; set; }
         public string? Note { get; set; }
-        public string Status { get; set; } = "Planning";
+        public TripStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

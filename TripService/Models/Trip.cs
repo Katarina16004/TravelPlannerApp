@@ -1,4 +1,6 @@
-﻿namespace TripService.Models
+﻿using Common.Enums;
+
+namespace TripService.Models
 {
     public class Trip
     {
@@ -9,7 +11,7 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal Budget { get; set; }
-        public string Status { get; set; } = "Planning"; 
+        public TripStatus Status { get; set; } = TripStatus.Planning;
         public string? Note { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<Destination> Destinations { get; set; } = new List<Destination>();

@@ -1,6 +1,7 @@
 ﻿using Common.DTOs;
 using Common.DTOs.Trip;
 using Common.DTOs.Trip.Destination;
+using Common.Enums;
 using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using TripService.Data;
@@ -57,7 +58,7 @@ namespace TripService.Services
                     StartDate = createDto.StartDate,
                     EndDate = createDto.EndDate,
                     Budget = createDto.Budget,
-                    Status = "Planning",
+                    Status = TripStatus.Planning,
                     CreatedAt = DateTime.UtcNow,
                     Note= createDto.Note
                 };
