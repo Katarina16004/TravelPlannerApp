@@ -1,17 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Threading;
-using System.Threading.Tasks;
-using Common.Interfaces;
 using Common.DTOs;
 using Common.DTOs.Trip;
+using Common.DTOs.Trip.Destination;
+using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System;
+using System.Collections.Generic;
+using System.Fabric;
+using System.Threading;
+using System.Threading.Tasks;
 using TripService.Data;
 using TripService.Services;
 
@@ -68,6 +69,26 @@ namespace TripService
 
         public Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId)
             => _tripBusinessService.DeleteTripAsync(tripId, userId);
+
+        public Task<ApiResponseDTO<DestinationResponseDTO>> AddDestinationAsync(Guid tripId, Guid userId, DestinationCreateDTO createDto)
+        {
+            return _tripBusinessService.AddDestinationAsync(tripId, userId, createDto);
+        }
+
+        public Task<ApiResponseDTO<List<DestinationResponseDTO>>> GetTripDestinationsAsync(Guid tripId, Guid userId, string requestingUserRole)
+        {
+            return _tripBusinessService.GetTripDestinationsAsync(tripId, userId, requestingUserRole);
+        }
+
+        public Task<ApiResponseDTO<DestinationResponseDTO>> UpdateDestinationAsync(Guid destinationId, DestinationCreateDTO updateDto, Guid userId, string requestingUserRole)
+        {
+            return _tripBusinessService.UpdateDestinationAsync(destinationId, updateDto, userId, requestingUserRole);
+        }
+
+        public Task<ApiResponseDTO<bool>> DeleteDestinationAsync(Guid destinationId, Guid userId, string requestingUserRole)
+        {
+            return _tripBusinessService.DeleteDestinationAsync(destinationId, userId, requestingUserRole);
+        }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {

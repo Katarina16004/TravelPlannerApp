@@ -10,6 +10,7 @@ namespace TripService.Data
         }
 
         public DbSet<Trip> Trips { get; set; }
+        public DbSet<Destination> Destinations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +32,24 @@ namespace TripService.Data
                 entity.Property(e => e.Note).IsRequired(false);
 
                 entity.HasIndex(e => e.UserId);
+            });
+
+
+            modelBuilder.Entity<Destination>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("newid()");
+                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Location).IsRequired();
+                entity.Property(e => e.ArrivalDate).IsRequired();
+                entity.Property(e => e.DepartureDate).IsRequired();
+                entity.Property(e => e.Description).IsRequired(false);
+
+                // One-to-Many
+                entity.HasOne(d => d.Trip)
+                      .WithMany(t => t.Destinations)
+                      .HasForeignKey(d => d.TripId)
+                      .OnDelete(DeleteBehavior.Cascade); // brise destinacije ako se obrise Trip
             });
         }
     }

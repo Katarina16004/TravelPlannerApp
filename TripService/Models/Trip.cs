@@ -12,5 +12,6 @@
         public string Status { get; set; } = "Planning"; 
         public string? Note { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public ICollection<Destination> Destinations { get; set; } = new List<Destination>();
     }
 }
