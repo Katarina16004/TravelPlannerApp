@@ -1,9 +1,4 @@
 ﻿using Common.DTOs.Trip.Destination;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TripService.Models;
 
 namespace TripService.Mappers

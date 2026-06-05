@@ -1,5 +1,6 @@
 using Common.DTOs;
 using Common.DTOs.Trip;
+using Common.DTOs.Trip.Activity;
 using Common.DTOs.Trip.Destination;
 using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +19,12 @@ using TripService.Services;
 
 namespace TripService
 {
-    internal sealed class TripService : StatelessService, ITripService, IDestinationService
+    internal sealed class TripService : StatelessService, ITripService, IDestinationService, IActivityService
     {
         private readonly ServiceProvider _serviceProvider;
         private readonly ITripService _tripBusinessService;
         private readonly IDestinationService _destinationBusinessService;
+        private readonly IActivityService _activityBusinessService;
 
         public TripService(StatelessServiceContext context)
             : base(context)
@@ -43,11 +45,13 @@ namespace TripService
                 services.AddSingleton<IConfiguration>(configuration);
                 services.AddScoped<ITripService, TripBusinessService>();
                 services.AddScoped<IDestinationService, DestinationBusinessService>();
+                services.AddScoped<IActivityService, ActivityBusinessService>();
 
                 _serviceProvider = services.BuildServiceProvider();
 
                 _tripBusinessService = _serviceProvider.GetRequiredService<ITripService>();
                 _destinationBusinessService = _serviceProvider.GetRequiredService<IDestinationService>();
+                _activityBusinessService = _serviceProvider.GetRequiredService<IActivityService>();
 
                 ServiceEventSource.Current.ServiceMessage(this.Context, "TripService initialized successfully");
             }
@@ -93,6 +97,44 @@ namespace TripService
         public Task<ApiResponseDTO<bool>> DeleteDestinationAsync(Guid destinationId, Guid userId, string requestingUserRole)
         {
             return _destinationBusinessService.DeleteDestinationAsync(destinationId, userId, requestingUserRole);
+        }
+        #endregion
+
+        #region ActivityService Methods
+        public async Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, ActivityCreateDTO createDto)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IActivityService>();
+                return await service.AddActivityAsync(destinationId, userId, createDto);
+            }
+        }
+
+        public async Task<ApiResponseDTO<List<ActivityResponseDTO>>> GetDestinationActivitiesAsync(Guid destinationId, Guid userId, string requestingUserRole)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IActivityService>();
+                return await service.GetDestinationActivitiesAsync(destinationId, userId, requestingUserRole);
+            }
+        }
+
+        public async Task<ApiResponseDTO<ActivityResponseDTO>> UpdateActivityAsync(Guid activityId, ActivityCreateDTO updateDto, Guid userId, string requestingUserRole)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IActivityService>();
+                return await service.UpdateActivityAsync(activityId, updateDto, userId, requestingUserRole);
+            }
+        }
+
+        public async Task<ApiResponseDTO<bool>> DeleteActivityAsync(Guid activityId, Guid userId, string requestingUserRole)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IActivityService>();
+                return await service.DeleteActivityAsync(activityId, userId, requestingUserRole);
+            }
         }
         #endregion
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
