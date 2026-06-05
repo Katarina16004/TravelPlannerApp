@@ -7,5 +7,6 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal Budget { get; set; }
+        public string? Note { get; set; }
     }
 }

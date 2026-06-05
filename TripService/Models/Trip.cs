@@ -9,7 +9,8 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal Budget { get; set; }
-        public string Status { get; set; } = "Planning";
+        public string Status { get; set; } = "Planning"; 
+        public string? Note { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

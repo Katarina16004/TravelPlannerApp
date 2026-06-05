@@ -17,7 +17,8 @@ namespace TripService.Mappers
                 EndDate = trip.EndDate,
                 Budget = trip.Budget,
                 Status = trip.Status,
-                CreatedAt = trip.CreatedAt
+                CreatedAt = trip.CreatedAt,
+                Note = trip.Note
             };
         }
     }

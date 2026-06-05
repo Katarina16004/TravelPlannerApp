@@ -28,6 +28,7 @@ namespace TripService.Data
                 entity.Property(e => e.Budget).IsRequired().HasColumnType("decimal(10,2)");
                 entity.Property(e => e.Status).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.Note).IsRequired(false);
 
                 entity.HasIndex(e => e.UserId);
             });

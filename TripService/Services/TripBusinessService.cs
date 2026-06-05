@@ -57,7 +57,8 @@ namespace TripService.Services
                     EndDate = createDto.EndDate,
                     Budget = createDto.Budget,
                     Status = "Planning",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    Note= createDto.Note
                 };
 
                 _context.Trips.Add(trip);
@@ -209,6 +210,7 @@ namespace TripService.Services
                 trip.StartDate = updateDto.StartDate;
                 trip.EndDate = updateDto.EndDate;
                 trip.Budget = updateDto.Budget;
+                trip.Note = updateDto.Note;
 
                 _context.Trips.Update(trip);
                 await _context.SaveChangesAsync();
