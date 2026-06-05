@@ -2,11 +2,11 @@
 {
     public enum ExpenseCategory
     {
-        Transport = 0,
-        Accommodation = 1,
-        Food = 2,
-        Tickets = 3,
-        Shopping = 4,
-        Other = 5
+        Transport = 1,
+        Accommodation = 2,
+        Food = 3,
+        Tickets = 4,
+        Shopping = 5,
+        Other = 6
     }
 }

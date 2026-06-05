@@ -2,6 +2,7 @@ using Common.DTOs;
 using Common.DTOs.Trip;
 using Common.DTOs.Trip.Activity;
 using Common.DTOs.Trip.Destination;
+using Common.DTOs.Trip.Expense;
 using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,22 +10,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using System;
-using System.Collections.Generic;
 using System.Fabric;
-using System.Threading;
-using System.Threading.Tasks;
 using TripService.Data;
 using TripService.Services;
 
 namespace TripService
 {
-    internal sealed class TripService : StatelessService, ITripService, IDestinationService, IActivityService
+    internal sealed class TripService : StatelessService, ITripService, IDestinationService, IActivityService, IExpenseService
     {
         private readonly ServiceProvider _serviceProvider;
         private readonly ITripService _tripBusinessService;
         private readonly IDestinationService _destinationBusinessService;
         private readonly IActivityService _activityBusinessService;
+        private readonly IExpenseService _expenseBusinessService;
 
         public TripService(StatelessServiceContext context)
             : base(context)
@@ -46,12 +44,14 @@ namespace TripService
                 services.AddScoped<ITripService, TripBusinessService>();
                 services.AddScoped<IDestinationService, DestinationBusinessService>();
                 services.AddScoped<IActivityService, ActivityBusinessService>();
+                services.AddScoped<IExpenseService, ExpenseBusinessService>();
 
                 _serviceProvider = services.BuildServiceProvider();
 
                 _tripBusinessService = _serviceProvider.GetRequiredService<ITripService>();
                 _destinationBusinessService = _serviceProvider.GetRequiredService<IDestinationService>();
                 _activityBusinessService = _serviceProvider.GetRequiredService<IActivityService>();
+                _expenseBusinessService = _serviceProvider.GetRequiredService<IExpenseService>();
 
                 ServiceEventSource.Current.ServiceMessage(this.Context, "TripService initialized successfully");
             }
@@ -63,19 +63,29 @@ namespace TripService
         }
         #region TripService Methods
         public Task<ApiResponseDTO<TripResponseDTO>> CreateTripAsync(Guid userId, TripCreateDTO createDto)
-            => _tripBusinessService.CreateTripAsync(userId, createDto);
+        {
+            return _tripBusinessService.CreateTripAsync(userId, createDto);
+        }
 
         public Task<ApiResponseDTO<TripResponseDTO>> GetTripByIdAsync(Guid tripId, Guid userId)
-            => _tripBusinessService.GetTripByIdAsync(tripId, userId);
+        {
+            return _tripBusinessService.GetTripByIdAsync(tripId, userId);
+        }
 
         public Task<ApiResponseDTO<List<TripResponseDTO>>> GetUserTripsAsync(Guid userId)
-            => _tripBusinessService.GetUserTripsAsync(userId);
+        {
+            return _tripBusinessService.GetUserTripsAsync(userId);
+        }
 
         public Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId)
-            => _tripBusinessService.UpdateTripAsync(tripId, updateDto, userId);
+        {
+            return _tripBusinessService.UpdateTripAsync(tripId, updateDto, userId);
+        }
 
         public Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId)
-            => _tripBusinessService.DeleteTripAsync(tripId, userId);
+        {
+            return _tripBusinessService.DeleteTripAsync(tripId, userId);
+        }
         #endregion
 
         #region DestinationService Methods
@@ -101,42 +111,50 @@ namespace TripService
         #endregion
 
         #region ActivityService Methods
-        public async Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, ActivityCreateDTO createDto)
+        public Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, ActivityCreateDTO createDto)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var service = scope.ServiceProvider.GetRequiredService<IActivityService>();
-                return await service.AddActivityAsync(destinationId, userId, createDto);
-            }
+            return _activityBusinessService.AddActivityAsync(destinationId, userId, createDto);
         }
 
-        public async Task<ApiResponseDTO<List<ActivityResponseDTO>>> GetDestinationActivitiesAsync(Guid destinationId, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<List<ActivityResponseDTO>>> GetDestinationActivitiesAsync(Guid destinationId, Guid userId, string requestingUserRole)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var service = scope.ServiceProvider.GetRequiredService<IActivityService>();
-                return await service.GetDestinationActivitiesAsync(destinationId, userId, requestingUserRole);
-            }
+            return _activityBusinessService.GetDestinationActivitiesAsync(destinationId, userId, requestingUserRole);
         }
 
-        public async Task<ApiResponseDTO<ActivityResponseDTO>> UpdateActivityAsync(Guid activityId, ActivityCreateDTO updateDto, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<ActivityResponseDTO>> UpdateActivityAsync(Guid activityId, ActivityCreateDTO updateDto, Guid userId, string requestingUserRole)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var service = scope.ServiceProvider.GetRequiredService<IActivityService>();
-                return await service.UpdateActivityAsync(activityId, updateDto, userId, requestingUserRole);
-            }
+            return _activityBusinessService.UpdateActivityAsync(activityId, updateDto, userId, requestingUserRole);
         }
 
-        public async Task<ApiResponseDTO<bool>> DeleteActivityAsync(Guid activityId, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<bool>> DeleteActivityAsync(Guid activityId, Guid userId, string requestingUserRole)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var service = scope.ServiceProvider.GetRequiredService<IActivityService>();
-                return await service.DeleteActivityAsync(activityId, userId, requestingUserRole);
-            }
+            return _activityBusinessService.DeleteActivityAsync(activityId, userId, requestingUserRole);
         }
         #endregion
+
+        #region ExpenseService Methods
+        public Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, ExpenseCreateDTO createDto)
+        {
+            return _expenseBusinessService.AddExpenseAsync(tripId, userId, createDto);
+        }
+
+        public Task<ApiResponseDTO<List<ExpenseResponseDTO>>> GetTripExpensesAsync(Guid tripId, Guid userId, string requestingUserRole)
+        {
+            return _expenseBusinessService.GetTripExpensesAsync(tripId, userId, requestingUserRole);
+        }
+
+        public Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId)
+        {
+            return _expenseBusinessService.GetBudgetSummaryAsync(tripId, userId);
+        }
+
+        public Task<ApiResponseDTO<bool>> DeleteExpenseAsync(Guid expenseId, Guid userId, string requestingUserRole)
+        {
+            return _expenseBusinessService.DeleteExpenseAsync(expenseId, userId, requestingUserRole);
+        }
+
+        #endregion
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();
