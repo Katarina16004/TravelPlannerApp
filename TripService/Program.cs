@@ -24,6 +24,7 @@ namespace TripService
                 ServiceRuntime.RegisterServiceAsync("TripServiceType",
                     context => new TripService(context)).GetAwaiter().GetResult();
 
+
                 ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(TripService).Name);
 
                 // Prevents this host process from terminating so services keep running.

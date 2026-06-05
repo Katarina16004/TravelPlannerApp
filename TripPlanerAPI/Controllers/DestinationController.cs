@@ -1,5 +1,4 @@
-﻿using Common.DTOs;
-using Common.DTOs.Trip.Destination;
+﻿using Common.DTOs.Trip.Destination;
 using Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +10,12 @@ namespace TripPlanerAPI.Controllers
     [ApiController]
     public class DestinationController : ControllerBase
     {
-        private readonly ITripService _tripServiceProxy;
+        private readonly IDestinationService _destinationServiceProxy;
 
         public DestinationController()
         {
-            _tripServiceProxy = ServiceProxy.Create<ITripService>(
-                new Uri("fabric:/TravelPlannerApp/TripService"));
+            _destinationServiceProxy = ServiceProxy.Create<IDestinationService>(
+                    new Uri("fabric:/TravelPlannerApp/TripService"));
         }
 
         [HttpPost("api/trip/{tripId}/destinations")]
@@ -29,7 +28,7 @@ namespace TripPlanerAPI.Controllers
                 if (userIdClaim == null) return Unauthorized();
 
                 Guid userId = Guid.Parse(userIdClaim.Value);
-                var result = await _tripServiceProxy.AddDestinationAsync(tripId, userId, createDto);
+                var result = await _destinationServiceProxy.AddDestinationAsync(tripId, userId, createDto);
 
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
@@ -53,7 +52,7 @@ namespace TripPlanerAPI.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
                 string role = roleClaim.Value;
 
-                var result = await _tripServiceProxy.GetTripDestinationsAsync(tripId, userId, role);
+                var result = await _destinationServiceProxy.GetTripDestinationsAsync(tripId, userId, role);
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
             }
@@ -76,7 +75,7 @@ namespace TripPlanerAPI.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
                 string role = roleClaim.Value;
 
-                var result = await _tripServiceProxy.UpdateDestinationAsync(id, updateDto, userId, role);
+                var result = await _destinationServiceProxy.UpdateDestinationAsync(id, updateDto, userId, role);
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
             }
@@ -99,7 +98,7 @@ namespace TripPlanerAPI.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
                 string role = roleClaim.Value;
 
-                var result = await _tripServiceProxy.DeleteDestinationAsync(id, userId, role);
+                var result = await _destinationServiceProxy.DeleteDestinationAsync(id, userId, role);
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
             }

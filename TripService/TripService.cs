@@ -18,10 +18,11 @@ using TripService.Services;
 
 namespace TripService
 {
-    internal sealed class TripService : StatelessService, ITripService
+    internal sealed class TripService : StatelessService, ITripService, IDestinationService
     {
         private readonly ServiceProvider _serviceProvider;
         private readonly ITripService _tripBusinessService;
+        private readonly IDestinationService _destinationBusinessService;
 
         public TripService(StatelessServiceContext context)
             : base(context)
@@ -41,10 +42,12 @@ namespace TripService
 
                 services.AddSingleton<IConfiguration>(configuration);
                 services.AddScoped<ITripService, TripBusinessService>();
+                services.AddScoped<IDestinationService, DestinationBusinessService>();
 
                 _serviceProvider = services.BuildServiceProvider();
 
                 _tripBusinessService = _serviceProvider.GetRequiredService<ITripService>();
+                _destinationBusinessService = _serviceProvider.GetRequiredService<IDestinationService>();
 
                 ServiceEventSource.Current.ServiceMessage(this.Context, "TripService initialized successfully");
             }
@@ -54,7 +57,7 @@ namespace TripService
                 throw;
             }
         }
-
+        #region TripService Methods
         public Task<ApiResponseDTO<TripResponseDTO>> CreateTripAsync(Guid userId, TripCreateDTO createDto)
             => _tripBusinessService.CreateTripAsync(userId, createDto);
 
@@ -69,27 +72,29 @@ namespace TripService
 
         public Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId)
             => _tripBusinessService.DeleteTripAsync(tripId, userId);
+        #endregion
 
+        #region DestinationService Methods
         public Task<ApiResponseDTO<DestinationResponseDTO>> AddDestinationAsync(Guid tripId, Guid userId, DestinationCreateDTO createDto)
         {
-            return _tripBusinessService.AddDestinationAsync(tripId, userId, createDto);
+            return _destinationBusinessService.AddDestinationAsync(tripId, userId, createDto);
         }
 
         public Task<ApiResponseDTO<List<DestinationResponseDTO>>> GetTripDestinationsAsync(Guid tripId, Guid userId, string requestingUserRole)
         {
-            return _tripBusinessService.GetTripDestinationsAsync(tripId, userId, requestingUserRole);
+            return _destinationBusinessService.GetTripDestinationsAsync(tripId, userId, requestingUserRole);
         }
 
         public Task<ApiResponseDTO<DestinationResponseDTO>> UpdateDestinationAsync(Guid destinationId, DestinationCreateDTO updateDto, Guid userId, string requestingUserRole)
         {
-            return _tripBusinessService.UpdateDestinationAsync(destinationId, updateDto, userId, requestingUserRole);
+            return _destinationBusinessService.UpdateDestinationAsync(destinationId, updateDto, userId, requestingUserRole);
         }
 
         public Task<ApiResponseDTO<bool>> DeleteDestinationAsync(Guid destinationId, Guid userId, string requestingUserRole)
         {
-            return _tripBusinessService.DeleteDestinationAsync(destinationId, userId, requestingUserRole);
+            return _destinationBusinessService.DeleteDestinationAsync(destinationId, userId, requestingUserRole);
         }
-
+        #endregion
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();
