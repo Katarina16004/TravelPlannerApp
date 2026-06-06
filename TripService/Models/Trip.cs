@@ -16,5 +16,6 @@ namespace TripService.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<Destination> Destinations { get; set; } = new List<Destination>();
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+        public virtual ICollection<ChecklistItem> ChecklistItems { get; set; } = new List<ChecklistItem>();
     }
 }

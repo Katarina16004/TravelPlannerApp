@@ -14,6 +14,7 @@ namespace TripService.Data
         public DbSet<Destination> Destinations { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<ChecklistItem> ChecklistItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -98,6 +99,21 @@ namespace TripService.Data
             modelBuilder.Entity<Trip>(entity =>
             {
                 entity.Property(t => t.Budget).HasColumnType("decimal(18,2)").HasDefaultValue(0.00m);
+            });
+
+            modelBuilder.Entity<ChecklistItem>(entity =>
+            {
+                entity.ToTable("ChecklistItems");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("newid()");
+
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.IsCompleted).IsRequired().HasDefaultValue(false);
+
+                entity.HasOne(c => c.Trip)
+                      .WithMany(t => t.ChecklistItems)
+                      .HasForeignKey(c => c.TripId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }
