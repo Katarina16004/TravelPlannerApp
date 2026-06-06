@@ -1,6 +1,7 @@
 using Common.DTOs;
 using Common.DTOs.Trip;
 using Common.DTOs.Trip.Activity;
+using Common.DTOs.Trip.CheckList;
 using Common.DTOs.Trip.Destination;
 using Common.DTOs.Trip.Expense;
 using Common.Interfaces;
@@ -16,13 +17,15 @@ using TripService.Services;
 
 namespace TripService
 {
-    internal sealed class TripService : StatelessService, ITripService, IDestinationService, IActivityService, IExpenseService
+    internal sealed class TripService : StatelessService, ITripService, IDestinationService, IActivityService, IExpenseService,
+        IChecklistService
     {
         private readonly ServiceProvider _serviceProvider;
         private readonly ITripService _tripBusinessService;
         private readonly IDestinationService _destinationBusinessService;
         private readonly IActivityService _activityBusinessService;
         private readonly IExpenseService _expenseBusinessService;
+        private readonly IChecklistService _ckecklistBusinessService;
 
         public TripService(StatelessServiceContext context)
             : base(context)
@@ -45,6 +48,7 @@ namespace TripService
                 services.AddScoped<IDestinationService, DestinationBusinessService>();
                 services.AddScoped<IActivityService, ActivityBusinessService>();
                 services.AddScoped<IExpenseService, ExpenseBusinessService>();
+                services.AddScoped<IChecklistService, ChecklistBusinessService>();
 
                 _serviceProvider = services.BuildServiceProvider();
 
@@ -52,6 +56,8 @@ namespace TripService
                 _destinationBusinessService = _serviceProvider.GetRequiredService<IDestinationService>();
                 _activityBusinessService = _serviceProvider.GetRequiredService<IActivityService>();
                 _expenseBusinessService = _serviceProvider.GetRequiredService<IExpenseService>();
+                _ckecklistBusinessService= _serviceProvider.GetRequiredService<IChecklistService>();
+
 
                 ServiceEventSource.Current.ServiceMessage(this.Context, "TripService initialized successfully");
             }
@@ -155,6 +161,28 @@ namespace TripService
 
         #endregion
 
+        #region ChecklistService Methods
+        public Task<ApiResponseDTO<ChecklistResponseDTO>> AddItemAsync(Guid tripId, Guid userId, ChecklistCreateDTO createDto)
+        {
+            return _ckecklistBusinessService.AddItemAsync(tripId, userId, createDto);
+        }
+
+        public Task<ApiResponseDTO<List<ChecklistResponseDTO>>> GetTripItemsAsync(Guid tripId, Guid userId)
+        {
+            return _ckecklistBusinessService.GetTripItemsAsync(tripId, userId);
+        }
+
+        public Task<ApiResponseDTO<bool>> ToggleItemAsync(Guid itemId, Guid userId)
+        {
+            return _ckecklistBusinessService.ToggleItemAsync(itemId, userId);
+        }
+
+        public Task<ApiResponseDTO<bool>> DeleteItemAsync(Guid itemId, Guid userId)
+        {
+            return _ckecklistBusinessService.DeleteItemAsync(itemId, userId);
+        }
+        #endregion
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();
@@ -168,5 +196,7 @@ namespace TripService
                 await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
             }
         }
+
+        
     }
 }
