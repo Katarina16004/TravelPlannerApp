@@ -13,10 +13,12 @@ namespace TripService.Services
     public class TripBusinessService : ITripService
     {
         private readonly TripDbContext _context;
+        private readonly ITripShareService _tripShareService;   
 
-        public TripBusinessService(TripDbContext context)
+        public TripBusinessService(TripDbContext context, ITripShareService tripShareService)
         {
             _context = context;
+            _tripShareService = tripShareService;
         }
         public async Task<ApiResponseDTO<TripResponseDTO>> CreateTripAsync(Guid userId, TripCreateDTO createDto)
         {
@@ -85,7 +87,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<TripResponseDTO>> GetTripByIdAsync(Guid tripId, Guid userId)
+        public async Task<ApiResponseDTO<TripResponseDTO>> GetTripByIdAsync(Guid tripId, Guid userId, string? token)
         {
             try
             {
@@ -102,11 +104,9 @@ namespace TripService.Services
 
                 if (trip.UserId != userId)
                 {
-                    return new ApiResponseDTO<TripResponseDTO>
-                    {
-                        Success = false,
-                        Message = "You do not have permission to view this trip."
-                    };
+                    var accessType = await _tripShareService.GetAccessTypeAsync(token);
+                    if (accessType == null) 
+                        return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Access denied." };
                 }
 
                 var tripResponseDto = TripMapper.MapToResponseDto(trip);
@@ -156,7 +156,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId)
+        public async Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId, string? token)
         {
             try
             {
@@ -173,11 +173,9 @@ namespace TripService.Services
 
                 if (trip.UserId != userId)
                 {
-                    return new ApiResponseDTO<TripResponseDTO>
-                    {
-                        Success = false,
-                        Message = "You do not have permission to update this trip."
-                    };
+                    var accessType = await _tripShareService.GetAccessTypeAsync(token);
+                    if (accessType != ShareAccessType.Edit)
+                        return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Access denied. Edit permission required." };
                 }
 
                 if (string.IsNullOrWhiteSpace(updateDto.Name))

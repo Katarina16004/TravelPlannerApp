@@ -51,23 +51,25 @@ namespace TripPlanerAPI.Controllers
 
         // GET: api/trip/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTripById(Guid id)
+        public async Task<IActionResult> GetTripById(Guid id, [FromQuery] string? token = null)
         {
             Guid userId = GetUserIdFromClaims();
-            if (userId == Guid.Empty) return Unauthorized(new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Invalid token." });
+            if (userId == Guid.Empty && string.IsNullOrEmpty(token))
+                return Unauthorized(new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Authentication required." });
 
-            var result = await _tripServiceProxy.GetTripByIdAsync(id, userId);
+            var result = await _tripServiceProxy.GetTripByIdAsync(id, userId, token);
             return result.Success ? Ok(result) : NotFound(result);
         }
 
         // PUT: api/trip/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTrip(Guid id, [FromBody] TripUpdateDTO updateDto)
+        public async Task<IActionResult> UpdateTrip(Guid id, [FromBody] TripUpdateDTO updateDto, [FromQuery] string? token = null)
         {
             Guid userId = GetUserIdFromClaims();
-            if (userId == Guid.Empty) return Unauthorized(new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Invalid token." });
+            if (userId == Guid.Empty && string.IsNullOrEmpty(token))
+                return Unauthorized(new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Authentication required." });
 
-            var result = await _tripServiceProxy.UpdateTripAsync(id, updateDto, userId);
+            var result = await _tripServiceProxy.UpdateTripAsync(id, updateDto, userId, token);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 

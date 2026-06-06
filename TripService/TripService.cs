@@ -78,9 +78,9 @@ namespace TripService
             return _tripBusinessService.CreateTripAsync(userId, createDto);
         }
 
-        public Task<ApiResponseDTO<TripResponseDTO>> GetTripByIdAsync(Guid tripId, Guid userId)
+        public Task<ApiResponseDTO<TripResponseDTO>> GetTripByIdAsync(Guid tripId, Guid userId, string? sharingToken)
         {
-            return _tripBusinessService.GetTripByIdAsync(tripId, userId);
+            return _tripBusinessService.GetTripByIdAsync(tripId, userId, sharingToken);
         }
 
         public Task<ApiResponseDTO<List<TripResponseDTO>>> GetUserTripsAsync(Guid userId)
@@ -88,9 +88,9 @@ namespace TripService
             return _tripBusinessService.GetUserTripsAsync(userId);
         }
 
-        public Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId)
+        public Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId, string? sharingToken)
         {
-            return _tripBusinessService.UpdateTripAsync(tripId, updateDto, userId);
+            return _tripBusinessService.UpdateTripAsync(tripId, updateDto, userId, sharingToken);
         }
 
         public Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId)
