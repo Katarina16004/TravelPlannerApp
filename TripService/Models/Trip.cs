@@ -17,5 +17,6 @@ namespace TripService.Models
         public ICollection<Destination> Destinations { get; set; } = new List<Destination>();
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
         public virtual ICollection<ChecklistItem> ChecklistItems { get; set; } = new List<ChecklistItem>();
+        public virtual ICollection<TripShare> TripShares { get; set; } = new List<TripShare>();
     }
 }

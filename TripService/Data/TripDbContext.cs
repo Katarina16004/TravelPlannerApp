@@ -15,6 +15,7 @@ namespace TripService.Data
         public DbSet<Activity> Activities { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<ChecklistItem> ChecklistItems { get; set; }
+        public DbSet<TripShare> TripShares { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -115,6 +116,28 @@ namespace TripService.Data
                       .HasForeignKey(c => c.TripId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+
+
+            modelBuilder.Entity<TripShare>(entity =>
+            {
+                entity.ToTable("TripShares");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("newid()");
+
+                entity.Property(e => e.Token).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.ExpiresAt).IsRequired();
+
+                entity.Property(e => e.AccessType)
+                      .HasConversion<string>()
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.HasOne(ts => ts.Trip)
+                      .WithMany(t => t.TripShares) 
+                      .HasForeignKey(ts => ts.TripId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
         }
     }
 }
