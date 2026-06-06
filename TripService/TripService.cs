@@ -100,24 +100,24 @@ namespace TripService
         #endregion
 
         #region DestinationService Methods
-        public Task<ApiResponseDTO<DestinationResponseDTO>> AddDestinationAsync(Guid tripId, Guid userId, DestinationCreateDTO createDto)
+        public Task<ApiResponseDTO<DestinationResponseDTO>> AddDestinationAsync(Guid tripId, Guid userId, string? sharingToken, DestinationCreateDTO createDto)
         {
-            return _destinationBusinessService.AddDestinationAsync(tripId, userId, createDto);
+            return _destinationBusinessService.AddDestinationAsync(tripId, userId, sharingToken, createDto);
         }
 
-        public Task<ApiResponseDTO<List<DestinationResponseDTO>>> GetTripDestinationsAsync(Guid tripId, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<List<DestinationResponseDTO>>> GetTripDestinationsAsync(Guid tripId, Guid userId, string? sharingToken, string requestingUserRole)
         {
-            return _destinationBusinessService.GetTripDestinationsAsync(tripId, userId, requestingUserRole);
+            return _destinationBusinessService.GetTripDestinationsAsync(tripId, userId, sharingToken, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<DestinationResponseDTO>> UpdateDestinationAsync(Guid destinationId, DestinationCreateDTO updateDto, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<DestinationResponseDTO>> UpdateDestinationAsync(Guid destinationId, DestinationCreateDTO updateDto, string? sharingToken, Guid userId, string requestingUserRole)
         {
-            return _destinationBusinessService.UpdateDestinationAsync(destinationId, updateDto, userId, requestingUserRole);
+            return _destinationBusinessService.UpdateDestinationAsync(destinationId, updateDto, sharingToken, userId, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<bool>> DeleteDestinationAsync(Guid destinationId, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<bool>> DeleteDestinationAsync(Guid destinationId, Guid userId, string? sharingToken, string requestingUserRole)
         {
-            return _destinationBusinessService.DeleteDestinationAsync(destinationId, userId, requestingUserRole);
+            return _destinationBusinessService.DeleteDestinationAsync(destinationId, userId, sharingToken, requestingUserRole);
         }
         #endregion
 
