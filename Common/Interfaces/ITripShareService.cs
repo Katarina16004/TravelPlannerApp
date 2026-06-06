@@ -1,5 +1,6 @@
 ﻿using Common.DTOs;
 using Common.DTOs.Trip.TripShare;
+using Common.Enums;
 using Microsoft.ServiceFabric.Services.Remoting;
 
 namespace Common.Interfaces
@@ -10,6 +11,8 @@ namespace Common.Interfaces
         Task<ApiResponseDTO<SharedTripDto>> GetSharedTripAsync(string token);
         Task<ApiResponseDTO<IEnumerable<TripShareDto>>> GetSharesByTripIdAsync(Guid tripId, Guid userId);
         Task<ApiResponseDTO<bool>> RevokeShareAsync(Guid id, Guid userId);
+
+        Task<ShareAccessType?> GetAccessTypeAsync(string token);
 
     }
 }

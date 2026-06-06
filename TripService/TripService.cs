@@ -4,6 +4,8 @@ using Common.DTOs.Trip.Activity;
 using Common.DTOs.Trip.CheckList;
 using Common.DTOs.Trip.Destination;
 using Common.DTOs.Trip.Expense;
+using Common.DTOs.Trip.TripShare;
+using Common.Enums;
 using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +20,7 @@ using TripService.Services;
 namespace TripService
 {
     internal sealed class TripService : StatelessService, ITripService, IDestinationService, IActivityService, IExpenseService,
-        IChecklistService
+        IChecklistService, ITripShareService
     {
         private readonly ServiceProvider _serviceProvider;
         private readonly ITripService _tripBusinessService;
@@ -26,6 +28,7 @@ namespace TripService
         private readonly IActivityService _activityBusinessService;
         private readonly IExpenseService _expenseBusinessService;
         private readonly IChecklistService _ckecklistBusinessService;
+        private readonly ITripShareService _tripShareBusinessService;
 
         public TripService(StatelessServiceContext context)
             : base(context)
@@ -49,6 +52,7 @@ namespace TripService
                 services.AddScoped<IActivityService, ActivityBusinessService>();
                 services.AddScoped<IExpenseService, ExpenseBusinessService>();
                 services.AddScoped<IChecklistService, ChecklistBusinessService>();
+                services.AddScoped<ITripShareService, TripShareBusinessService>();
 
                 _serviceProvider = services.BuildServiceProvider();
 
@@ -57,6 +61,7 @@ namespace TripService
                 _activityBusinessService = _serviceProvider.GetRequiredService<IActivityService>();
                 _expenseBusinessService = _serviceProvider.GetRequiredService<IExpenseService>();
                 _ckecklistBusinessService= _serviceProvider.GetRequiredService<IChecklistService>();
+                _tripShareBusinessService= _serviceProvider.GetRequiredService<ITripShareService>();
 
 
                 ServiceEventSource.Current.ServiceMessage(this.Context, "TripService initialized successfully");
@@ -183,6 +188,34 @@ namespace TripService
         }
         #endregion
 
+        #region TripShareService Methods
+
+        public Task<ApiResponseDTO<TripShareDto>> CreateShareAsync(CreateTripShareDto dto, Guid userId)
+        {
+            return _tripShareBusinessService.CreateShareAsync(dto, userId);
+        }
+
+        public Task<ApiResponseDTO<SharedTripDto>> GetSharedTripAsync(string token)
+        {
+            return _tripShareBusinessService.GetSharedTripAsync(token);
+        }
+
+        public Task<ApiResponseDTO<IEnumerable<TripShareDto>>> GetSharesByTripIdAsync(Guid tripId, Guid userId)
+        {
+            return _tripShareBusinessService.GetSharesByTripIdAsync(tripId, userId);
+        }
+
+        public Task<ApiResponseDTO<bool>> RevokeShareAsync(Guid id, Guid userId)
+        {
+            return _tripShareBusinessService.RevokeShareAsync(id, userId);
+        }
+        public Task<ShareAccessType?> GetAccessTypeAsync(string token)
+        {
+            return _tripShareBusinessService.GetAccessTypeAsync(token);
+        }
+
+        #endregion
+
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
             return this.CreateServiceRemotingInstanceListeners();
@@ -197,6 +230,6 @@ namespace TripService
             }
         }
 
-        
+       
     }
 }

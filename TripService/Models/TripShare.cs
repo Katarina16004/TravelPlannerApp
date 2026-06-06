@@ -19,5 +19,6 @@ namespace TripService.Models
         public ShareAccessType AccessType { get; set; }
 
         public DateTime ExpiresAt { get; set; }
+        public string QrCodeBase64 { get; set; } = string.Empty;
     }
 }
