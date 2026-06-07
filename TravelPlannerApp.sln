@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36811.4 d17.14
+VisualStudioVersion = 17.14.36811.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "TravelPlannerApp", "TravelPlannerApp\TravelPlannerApp.sfproj", "{8C69A0A3-0292-411B-B585-23E97BFC4E0D}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripService", "TripService\TripService.csproj", "{663BE405-030B-4FD9-A508-E585EF746DF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{B91D5917-9B15-4030-A7C9-577CEFE5669F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService", "EmailService\EmailService.csproj", "{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,14 @@ Global
 		{B91D5917-9B15-4030-A7C9-577CEFE5669F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B91D5917-9B15-4030-A7C9-577CEFE5669F}.Release|x64.ActiveCfg = Release|Any CPU
 		{B91D5917-9B15-4030-A7C9-577CEFE5669F}.Release|x64.Build.0 = Release|Any CPU
+		{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}.Debug|x64.Build.0 = Debug|Any CPU
+		{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}.Release|x64.ActiveCfg = Release|Any CPU
+		{5AD88559-4FB2-489A-8170-B2B1C7BBA4FA}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -36,6 +36,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EmailService\EmailService.csproj" />
     <ProjectReference Include="..\TripPlanerAPI\TripPlanerAPI.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/swagger</ServiceLaunchUrl>
     </ProjectReference>

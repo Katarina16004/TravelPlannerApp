@@ -4,6 +4,10 @@
     <Parameter Name="TripPlanerAPI_ASPNETCORE_ENVIRONMENT" DefaultValue="" />
   </Parameters>
   <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="EmailServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="TripServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>

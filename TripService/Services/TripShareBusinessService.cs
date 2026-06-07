@@ -7,6 +7,9 @@ using QRCoder;
 using TripService.Data;
 using TripService.Mappers;
 using TripService.Models;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
+using Microsoft.ServiceFabric.Services.Client;
+using Common.Events;
 
 namespace TripService.Services
 {
@@ -49,19 +52,46 @@ namespace TripService.Services
                 _context.TripShares.Add(share);
                 await _context.SaveChangesAsync();
 
+                var responseDto = new TripShareDto
+                {
+                    Id = share.Id,
+                    TripId = share.TripId,
+                    Token = share.Token,
+                    AccessType = share.AccessType,
+                    ExpiresAt = share.ExpiresAt,
+                    QrCodeBase64 = share.QrCodeBase64
+                };
+
+                // slanje mejla
+                if (!string.IsNullOrEmpty(dto.Email))
+                {
+                    try
+                    {
+                        var emailEvent = new EmailEvent
+                        {
+                            Email = dto.Email,
+                            TripShareDto = responseDto
+                        };
+
+                        var emailServiceUri = new Uri("fabric:/TravelPlannerApp/EmailService");
+
+                        var partitionKey = new ServicePartitionKey(1);
+
+                        var emailServiceProxy = ServiceProxy.Create<IEmailService>(emailServiceUri, partitionKey);
+
+                        await emailServiceProxy.PublishEvent(emailEvent);
+                    }
+                    catch (Exception serviceFabricEx)
+                    {
+                        Console.WriteLine($"Service Fabric Remoting Error: {serviceFabricEx.Message}");
+                    }
+                }
+
                 return new ApiResponseDTO<TripShareDto>
                 {
                     Success = true,
-                    Data = new TripShareDto
-                    {
-                        Id = share.Id,
-                        TripId = share.TripId,
-                        Token = share.Token,
-                        AccessType = share.AccessType,
-                        ExpiresAt = share.ExpiresAt,
-                        QrCodeBase64 = share.QrCodeBase64
-                    },
-                    Message = "Share link created successfully."
+                    Data = responseDto,
+                    Message = "Share link created and email notification queued successfully."
                 };
             }
             catch (Exception ex)
