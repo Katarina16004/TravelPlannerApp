@@ -18,10 +18,35 @@ namespace EmailService
             message.To.Add(new MailboxAddress(string.Empty, toEmail));
             message.Subject = subject;
 
-            message.Body = new TextPart("html")
+            var bodyBuilder = new BodyBuilder();
+
+            try
             {
-                Text = htmlBody
-            };
+                string searchString = "base64,";
+                int startIndex = htmlBody.IndexOf(searchString);
+
+                if (startIndex != -1)
+                {
+                    startIndex += searchString.Length;
+                    int endIndex = htmlBody.IndexOf("'", startIndex);
+                    if (endIndex == -1) endIndex = htmlBody.IndexOf("\"", startIndex);
+
+                    string base64Data = htmlBody.Substring(startIndex, endIndex - startIndex);
+                    byte[] imageBytes = Convert.FromBase64String(base64Data);
+
+                    var image = bodyBuilder.LinkedResources.Add("qrcode.png", imageBytes);
+                    image.ContentId = MimeKit.Utils.MimeUtils.GenerateMessageId();
+
+                    string oldSrc = htmlBody.Substring(htmlBody.IndexOf("data:image"), endIndex - htmlBody.IndexOf("data:image"));
+                    htmlBody = htmlBody.Replace(oldSrc, $"cid:{image.ContentId}");
+                }
+            }
+            catch
+            {
+            }
+
+            bodyBuilder.HtmlBody = htmlBody;
+            message.Body = bodyBuilder.ToMessageBody();
 
             using (var client = new SmtpClient())
             {

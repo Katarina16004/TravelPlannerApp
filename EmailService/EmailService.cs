@@ -108,7 +108,7 @@ namespace EmailService
                     <h2>This trip is shared with you</h2>
                     <p>You have access to the trip. Type of access: <strong>{accessText}</strong></p>
                     <div style='margin: 20px;'>
-                        <img src='data:image/png;base64,{shareDto.QrCodeBase64}' alt='QR Code' style='padding: 10px; border: 1px solid #ddd;' />
+                       <img src='data:image/png;base64,{shareDto.QrCodeBase64}' alt='QR Code' style='padding: 10px; border: 1px solid #ddd; width: 200px; height: 200px;' />
                     </div>
                     <p style='font-size: 12px; color: #888;'>This share expires in: {shareDto.ExpiresAt:dd.MM.yyyy u HH:mm} UTC</p>
                 </div>
