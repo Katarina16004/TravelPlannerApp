@@ -20,7 +20,7 @@ namespace TripPlanerAPI.Controllers
 
         [HttpPost("api/destination/{destinationId}/activities")]
         [Authorize]
-        public async Task<IActionResult> AddActivity(Guid destinationId, [FromBody] ActivityCreateDTO createDto)
+        public async Task<IActionResult> AddActivity(Guid destinationId, [FromBody] ActivityCreateDTO createDto, [FromQuery] string? token = null)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace TripPlanerAPI.Controllers
                 if (userIdClaim == null) return Unauthorized();
 
                 Guid userId = Guid.Parse(userIdClaim.Value);
-                var result = await _activityServiceProxy.AddActivityAsync(destinationId, userId, createDto);
+                var result = await _activityServiceProxy.AddActivityAsync(destinationId, userId, token, createDto);
 
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
@@ -41,7 +41,7 @@ namespace TripPlanerAPI.Controllers
 
         [HttpGet("api/destination/{destinationId}/activities")]
         [Authorize]
-        public async Task<IActionResult> GetDestinationActivities(Guid destinationId)
+        public async Task<IActionResult> GetDestinationActivities(Guid destinationId, [FromQuery] string? token = null)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace TripPlanerAPI.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
                 string role = roleClaim.Value;
 
-                var result = await _activityServiceProxy.GetDestinationActivitiesAsync(destinationId, userId, role);
+                var result = await _activityServiceProxy.GetDestinationActivitiesAsync(destinationId, userId, token, role);
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
             }
@@ -64,7 +64,7 @@ namespace TripPlanerAPI.Controllers
 
         [HttpPut("api/activities/{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateActivity(Guid id, [FromBody] ActivityCreateDTO updateDto)
+        public async Task<IActionResult> UpdateActivity(Guid id, [FromBody] ActivityCreateDTO updateDto, [FromQuery] string? token = null)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace TripPlanerAPI.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
                 string role = roleClaim.Value;
 
-                var result = await _activityServiceProxy.UpdateActivityAsync(id, updateDto, userId, role);
+                var result = await _activityServiceProxy.UpdateActivityAsync(id, token, updateDto, userId, role);
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
             }
@@ -87,7 +87,7 @@ namespace TripPlanerAPI.Controllers
 
         [HttpDelete("api/activities/{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteActivity(Guid id)
+        public async Task<IActionResult> DeleteActivity(Guid id, [FromQuery] string? token = null)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace TripPlanerAPI.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
                 string role = roleClaim.Value;
 
-                var result = await _activityServiceProxy.DeleteActivityAsync(id, userId, role);
+                var result = await _activityServiceProxy.DeleteActivityAsync(id, token, userId, role);
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
             }

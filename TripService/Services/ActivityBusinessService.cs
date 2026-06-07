@@ -1,5 +1,7 @@
 ﻿using Common.DTOs;
 using Common.DTOs.Trip.Activity;
+using Common.DTOs.Trip.Destination;
+using Common.Enums;
 using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using TripService.Data;
@@ -11,13 +13,30 @@ namespace TripService.Services
     public class ActivityBusinessService : IActivityService
     {
         private readonly TripDbContext _context;
+        private readonly ITripShareService _tripShareService;
 
-        public ActivityBusinessService(TripDbContext context)
+        public ActivityBusinessService(TripDbContext context, ITripShareService tripShareService)
         {
             _context = context;
+            _tripShareService = tripShareService;
+        }
+        private async Task<bool> HasAccess(Trip trip, Guid userId, string? token, ShareAccessType requiredAccess)
+        {
+            if (trip.UserId == userId) return true;
+
+            if (string.IsNullOrEmpty(token)) return false;
+
+            var accessType = await _tripShareService.GetAccessTypeAsync(token);
+
+            if (accessType == null) return false;
+
+            if (accessType == ShareAccessType.Edit) return true;
+            if (requiredAccess == ShareAccessType.View && accessType == ShareAccessType.View) return true;
+
+            return false;
         }
 
-        public async Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, ActivityCreateDTO createDto)
+        public async Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, string? token, ActivityCreateDTO createDto)
         {
             try
             {
@@ -30,10 +49,8 @@ namespace TripService.Services
                     return new ApiResponseDTO<ActivityResponseDTO> { Success = false, Message = "Destination not found." };
                 }
 
-                if (destination.Trip.UserId != userId)
-                {
-                    return new ApiResponseDTO<ActivityResponseDTO> { Success = false, Message = "Permission denied." };
-                }
+                if (!await HasAccess(destination.Trip, userId, token, ShareAccessType.Edit))
+                    return new ApiResponseDTO<ActivityResponseDTO> { Success = false, Message = "Access denied." };
 
                 if (createDto.StartTime >= createDto.EndTime)
                 {
@@ -78,7 +95,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<List<ActivityResponseDTO>>> GetDestinationActivitiesAsync(Guid destinationId, Guid userId, string requestingUserRole)
+        public async Task<ApiResponseDTO<List<ActivityResponseDTO>>> GetDestinationActivitiesAsync(Guid destinationId, Guid userId,string? token, string requestingUserRole)
         {
             try
             {
@@ -91,7 +108,8 @@ namespace TripService.Services
                     return new ApiResponseDTO<List<ActivityResponseDTO>> { Success = false, Message = "Destination not found." };
                 }
 
-                if (destination.Trip.UserId != userId && requestingUserRole != "Admin")
+                if (!await HasAccess(destination.Trip, userId, token, ShareAccessType.Edit) && !await HasAccess(destination.Trip, userId, token, ShareAccessType.View)
+                   && requestingUserRole != "Admin")
                 {
                     return new ApiResponseDTO<List<ActivityResponseDTO>> { Success = false, Message = "Permission denied." };
                 }
@@ -116,7 +134,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<ActivityResponseDTO>> UpdateActivityAsync(Guid activityId, ActivityCreateDTO updateDto, Guid userId, string requestingUserRole)
+        public async Task<ApiResponseDTO<ActivityResponseDTO>> UpdateActivityAsync(Guid activityId, string? token, ActivityCreateDTO updateDto, Guid userId, string requestingUserRole)
         {
             try
             {
@@ -130,7 +148,7 @@ namespace TripService.Services
                     return new ApiResponseDTO<ActivityResponseDTO> { Success = false, Message = "Activity not found." };
                 }
 
-                if (activity.Destination.Trip.UserId != userId && requestingUserRole != "Admin")
+                if (!await HasAccess(activity.Destination.Trip, userId, token, ShareAccessType.Edit) && requestingUserRole != "Admin")
                 {
                     return new ApiResponseDTO<ActivityResponseDTO> { Success = false, Message = "Permission denied." };
                 }
@@ -173,7 +191,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<bool>> DeleteActivityAsync(Guid activityId, Guid userId, string requestingUserRole)
+        public async Task<ApiResponseDTO<bool>> DeleteActivityAsync(Guid activityId, string? token, Guid userId, string requestingUserRole)
         {
             try
             {
@@ -187,7 +205,7 @@ namespace TripService.Services
                     return new ApiResponseDTO<bool> { Success = false, Message = "Activity not found." };
                 }
 
-                if (activity.Destination.Trip.UserId != userId && requestingUserRole != "Admin")
+                if (!await HasAccess(activity.Destination.Trip, userId, token, ShareAccessType.Edit) && requestingUserRole != "Admin")
                 {
                     return new ApiResponseDTO<bool> { Success = false, Message = "Permission denied." };
                 }

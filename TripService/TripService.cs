@@ -122,46 +122,46 @@ namespace TripService
         #endregion
 
         #region ActivityService Methods
-        public Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, ActivityCreateDTO createDto)
+        public Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, string? sharingToken, ActivityCreateDTO createDto)
         {
-            return _activityBusinessService.AddActivityAsync(destinationId, userId, createDto);
+            return _activityBusinessService.AddActivityAsync(destinationId, userId, sharingToken, createDto);
         }
 
-        public Task<ApiResponseDTO<List<ActivityResponseDTO>>> GetDestinationActivitiesAsync(Guid destinationId, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<List<ActivityResponseDTO>>> GetDestinationActivitiesAsync(Guid destinationId, Guid userId, string? sharingToken, string requestingUserRole)
         {
-            return _activityBusinessService.GetDestinationActivitiesAsync(destinationId, userId, requestingUserRole);
+            return _activityBusinessService.GetDestinationActivitiesAsync(destinationId, userId, sharingToken, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<ActivityResponseDTO>> UpdateActivityAsync(Guid activityId, ActivityCreateDTO updateDto, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<ActivityResponseDTO>> UpdateActivityAsync(Guid activityId, string? sharingToken, ActivityCreateDTO updateDto, Guid userId, string requestingUserRole)
         {
-            return _activityBusinessService.UpdateActivityAsync(activityId, updateDto, userId, requestingUserRole);
+            return _activityBusinessService.UpdateActivityAsync(activityId, sharingToken, updateDto, userId, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<bool>> DeleteActivityAsync(Guid activityId, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<bool>> DeleteActivityAsync(Guid activityId, string? sharingToken, Guid userId, string requestingUserRole)
         {
-            return _activityBusinessService.DeleteActivityAsync(activityId, userId, requestingUserRole);
+            return _activityBusinessService.DeleteActivityAsync(activityId, sharingToken, userId, requestingUserRole);
         }
         #endregion
 
         #region ExpenseService Methods
-        public Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, ExpenseCreateDTO createDto)
+        public Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, string? sharingToken, ExpenseCreateDTO createDto)
         {
-            return _expenseBusinessService.AddExpenseAsync(tripId, userId, createDto);
+            return _expenseBusinessService.AddExpenseAsync(tripId, userId, sharingToken, createDto);
         }
 
-        public Task<ApiResponseDTO<List<ExpenseResponseDTO>>> GetTripExpensesAsync(Guid tripId, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<List<ExpenseResponseDTO>>> GetTripExpensesAsync(Guid tripId, Guid userId, string? sharingToken, string requestingUserRole)
         {
-            return _expenseBusinessService.GetTripExpensesAsync(tripId, userId, requestingUserRole);
+            return _expenseBusinessService.GetTripExpensesAsync(tripId, userId, sharingToken, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId)
+        public Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId, string? sharingToken)
         {
-            return _expenseBusinessService.GetBudgetSummaryAsync(tripId, userId);
+            return _expenseBusinessService.GetBudgetSummaryAsync(tripId, userId, sharingToken);
         }
 
-        public Task<ApiResponseDTO<bool>> DeleteExpenseAsync(Guid expenseId, Guid userId, string requestingUserRole)
+        public Task<ApiResponseDTO<bool>> DeleteExpenseAsync(Guid expenseId, Guid userId, string? sharingToken, string requestingUserRole)
         {
-            return _expenseBusinessService.DeleteExpenseAsync(expenseId, userId, requestingUserRole);
+            return _expenseBusinessService.DeleteExpenseAsync(expenseId, userId, sharingToken, requestingUserRole);
         }
 
         #endregion

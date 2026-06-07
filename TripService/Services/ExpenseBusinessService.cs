@@ -1,5 +1,7 @@
 ﻿using Common.DTOs;
+using Common.DTOs.Trip.Activity;
 using Common.DTOs.Trip.Expense;
+using Common.Enums;
 using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using TripService.Data;
@@ -11,13 +13,28 @@ namespace TripService.Services
     public class ExpenseBusinessService : IExpenseService
     {
         private readonly TripDbContext _context;
+        private readonly ITripShareService _tripShareService;
 
-        public ExpenseBusinessService(TripDbContext context)
+        public ExpenseBusinessService(TripDbContext context, ITripShareService tripShareService)
         {
             _context = context;
+            _tripShareService = tripShareService;
+        }
+        private async Task<bool> HasAccess(Trip trip, Guid userId, string? token, ShareAccessType requiredAccess)
+        {
+            if (trip.UserId == userId) return true;
+            if (string.IsNullOrEmpty(token)) return false;
+
+            var accessType = await _tripShareService.GetAccessTypeAsync(token);
+            if (accessType == null) return false;
+
+            if (accessType == ShareAccessType.Edit) return true;
+            if (requiredAccess == ShareAccessType.View && accessType == ShareAccessType.View) return true;
+
+            return false;
         }
 
-        public async Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, ExpenseCreateDTO createDto)
+        public async Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, string? token, ExpenseCreateDTO createDto)
         {
             try
             {
@@ -27,10 +44,8 @@ namespace TripService.Services
                     return new ApiResponseDTO<ExpenseResponseDTO> { Success = false, Message = "Trip not found." };
                 }
 
-                if (trip.UserId != userId)
-                {
-                    return new ApiResponseDTO<ExpenseResponseDTO> { Success = false, Message = "Permission denied." };
-                }
+                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit))
+                    return new ApiResponseDTO<ExpenseResponseDTO> { Success = false, Message = "Access denied." };
 
                 var expense = new Expense
                 {
@@ -60,7 +75,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<List<ExpenseResponseDTO>>> GetTripExpensesAsync(Guid tripId, Guid userId, string requestingUserRole)
+        public async Task<ApiResponseDTO<List<ExpenseResponseDTO>>> GetTripExpensesAsync(Guid tripId, Guid userId, string? token, string requestingUserRole)
         {
             try
             {
@@ -70,7 +85,8 @@ namespace TripService.Services
                     return new ApiResponseDTO<List<ExpenseResponseDTO>> { Success = false, Message = "Trip not found." };
                 }
 
-                if (trip.UserId != userId && requestingUserRole != "Admin")
+                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit) && !await HasAccess(trip, userId, token, ShareAccessType.View)
+                   && requestingUserRole != "Admin")
                 {
                     return new ApiResponseDTO<List<ExpenseResponseDTO>> { Success = false, Message = "Permission denied." };
                 }
@@ -95,7 +111,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId)
+        public async Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId, string? token)
         {
             try
             {
@@ -108,7 +124,7 @@ namespace TripService.Services
                     return new ApiResponseDTO<BudgetSummaryDTO> { Success = false, Message = "Trip not found." };
                 }
 
-                if (trip.UserId != userId)
+                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit) && !await HasAccess(trip, userId, token, ShareAccessType.View))
                 {
                     return new ApiResponseDTO<BudgetSummaryDTO> { Success = false, Message = "Permission denied." };
                 }
@@ -138,7 +154,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<bool>> DeleteExpenseAsync(Guid expenseId, Guid userId, string requestingUserRole)
+        public async Task<ApiResponseDTO<bool>> DeleteExpenseAsync(Guid expenseId, Guid userId, string? token, string requestingUserRole)
         {
             try
             {
@@ -151,7 +167,7 @@ namespace TripService.Services
                     return new ApiResponseDTO<bool> { Success = false, Message = "Expense not found." };
                 }
 
-                if (expense.Trip.UserId != userId && requestingUserRole != "Admin")
+                if (!await HasAccess(expense.Trip, userId, token, ShareAccessType.Edit) && requestingUserRole != "Admin")
                 {
                     return new ApiResponseDTO<bool> { Success = false, Message = "Permission denied." };
                 }

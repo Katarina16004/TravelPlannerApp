@@ -20,7 +20,7 @@ namespace TripPlanerAPI.Controllers
 
         [HttpPost("api/trip/{tripId}/expenses")]
         [Authorize]
-        public async Task<IActionResult> AddExpense(Guid tripId, [FromBody] ExpenseCreateDTO createDto)
+        public async Task<IActionResult> AddExpense(Guid tripId, [FromBody] ExpenseCreateDTO createDto, [FromQuery] string? token = null)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace TripPlanerAPI.Controllers
                 if (userIdClaim == null) return Unauthorized();
 
                 Guid userId = Guid.Parse(userIdClaim.Value);
-                var result = await _expenseServiceProxy.AddExpenseAsync(tripId, userId, createDto);
+                var result = await _expenseServiceProxy.AddExpenseAsync(tripId, userId, token, createDto);
 
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
@@ -41,7 +41,7 @@ namespace TripPlanerAPI.Controllers
 
         [HttpGet("api/trip/{tripId}/expenses")]
         [Authorize]
-        public async Task<IActionResult> GetTripExpenses(Guid tripId)
+        public async Task<IActionResult> GetTripExpenses(Guid tripId, [FromQuery] string? token = null)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace TripPlanerAPI.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
                 string role = roleClaim.Value;
 
-                var result = await _expenseServiceProxy.GetTripExpensesAsync(tripId, userId, role);
+                var result = await _expenseServiceProxy.GetTripExpensesAsync(tripId, userId, token, role);
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
             }
@@ -64,7 +64,7 @@ namespace TripPlanerAPI.Controllers
 
         [HttpGet("api/trip/{tripId}/budget-summary")]
         [Authorize]
-        public async Task<IActionResult> GetBudgetSummary(Guid tripId)
+        public async Task<IActionResult> GetBudgetSummary(Guid tripId, [FromQuery] string? token = null)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace TripPlanerAPI.Controllers
                 if (userIdClaim == null) return Unauthorized();
 
                 Guid userId = Guid.Parse(userIdClaim.Value);
-                var result = await _expenseServiceProxy.GetBudgetSummaryAsync(tripId, userId);
+                var result = await _expenseServiceProxy.GetBudgetSummaryAsync(tripId, userId, token);
 
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
@@ -85,7 +85,7 @@ namespace TripPlanerAPI.Controllers
 
         [HttpDelete("api/expenses/{id}")]
         [Authorize]
-        public async Task<IActionResult> DeleteExpense(Guid id)
+        public async Task<IActionResult> DeleteExpense(Guid id, [FromQuery] string? token = null)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace TripPlanerAPI.Controllers
                 Guid userId = Guid.Parse(userIdClaim.Value);
                 string role = roleClaim.Value;
 
-                var result = await _expenseServiceProxy.DeleteExpenseAsync(id, userId, role);
+                var result = await _expenseServiceProxy.DeleteExpenseAsync(id, userId, token, role);
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
             }
