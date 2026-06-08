@@ -40,6 +40,17 @@ namespace TripPlanerAPI
                         ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
 
                         var builder = WebApplication.CreateBuilder();
+                        builder.Services.AddCors(options =>
+                        {
+                            options.AddPolicy("AllowReactFrontend",
+                                policy =>
+                                {
+                                    policy.WithOrigins("http://localhost:5173") 
+                                          .AllowAnyHeader()
+                                          .AllowAnyMethod()
+                                          .AllowCredentials(); 
+                                });
+                        });
 
                         builder.Services.AddSingleton<StatelessServiceContext>(serviceContext);
 
@@ -83,6 +94,7 @@ namespace TripPlanerAPI
                         app.UseSwaggerUI();
                         }
 
+                        app.UseCors("AllowReactFrontend");
                         app.UseAuthentication();
                         app.UseAuthorization();
                         app.MapControllers();
