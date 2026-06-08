@@ -361,3 +361,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Ignorisi zavisnosti za React frontend
+Frontend/node_modules/
+Frontend/build/
+
+# Ignorisi build fajlove za backend
+TravelPlannerApp/.vs/
+TravelPlannerApp/bin/
+TravelPlannerApp/obj/
