@@ -23,7 +23,7 @@ const InputField = ({
                         display: 'block',
                         marginBottom: '6px',
                         fontSize: '13px',
-                        color: travelTheme.colors.muted,
+                        color: travelTheme.colors.text,
                         fontWeight: 600,
                         paddingLeft: '2px'
                     }}

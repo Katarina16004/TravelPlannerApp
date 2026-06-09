@@ -71,29 +71,36 @@ const MyProfile = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            fontFamily: travelTheme.font
+            fontFamily: travelTheme.font,
+            position: 'relative',
+            overflow: 'hidden'
         }}>
+
             <div style={{
-                width: '520px',
+                position: 'absolute',
+                width: '500px',
+                height: '500px',
+                background: 'radial-gradient(circle, rgba(43,108,176,0.6) 10%, rgba(26,54,93,0.1) 70%)',
+                filter: 'blur(40px)',
+                top: '20%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 0
+            }} />
+
+            <div style={{
+                width: '420px',
                 maxWidth: '90%',
                 backgroundColor: travelTheme.colors.surface,
                 borderRadius: travelTheme.radius.large,
                 border: `1px solid ${travelTheme.colors.border}`,
                 boxShadow: travelTheme.shadow,
-                padding: '30px'
+                padding: '30px',
+                position: 'relative',
+                zIndex: 1
             }}>
                 <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-                    <h2 style={{ margin: 0, color: travelTheme.colors.text }}>
-                        My Profile
-                    </h2>
-
-                    <p style={{
-                        margin: 0,
-                        fontSize: '13px',
-                        color: travelTheme.colors.muted
-                    }}>
-                        Manage your account info
-                    </p>
+                    <h2>My Profile</h2>
                 </div>
 
                 {profile && (

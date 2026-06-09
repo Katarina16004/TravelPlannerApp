@@ -8,7 +8,7 @@ export const travelTheme = {
         surface: '#FFFFFF',    
         text: '#2D3748',  
         muted: '#718096',      
-        border: '#E2E8F0',   
+        border: '#aec7e7',   
         success: '#319795',   
         danger: '#E53E3E' ,
         backgroundtwo: '#bedcec' 

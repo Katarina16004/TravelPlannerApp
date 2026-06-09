@@ -280,25 +280,6 @@ namespace UserService.Services
 
                 if (!string.IsNullOrWhiteSpace(updateDto.NewPassword))
                 {
-                    if (string.IsNullOrWhiteSpace(updateDto.CurrentPassword))
-                    {
-                        return new ApiResponseDTO<UserResponseDTO>
-                        {
-                            Success = false,
-                            Message = "Current password is required to change password."
-                        };
-                    }
-
-                    bool currentPasswordValid = BCrypt.Net.BCrypt.Verify(updateDto.CurrentPassword, user.PasswordHash);
-                    if (!currentPasswordValid)
-                    {
-                        return new ApiResponseDTO<UserResponseDTO>
-                        {
-                            Success = false,
-                            Message = "Current password is incorrect."
-                        };
-                    }
-
                     if (updateDto.NewPassword.Length < 6)
                     {
                         return new ApiResponseDTO<UserResponseDTO>
@@ -306,6 +287,30 @@ namespace UserService.Services
                             Success = false,
                             Message = "New password must have at least 6 characters."
                         };
+                    }
+
+                    if (requestingUserRole != "Admin")
+                    {
+                        if (string.IsNullOrWhiteSpace(updateDto.CurrentPassword))
+                        {
+                            return new ApiResponseDTO<UserResponseDTO>
+                            {
+                                Success = false,
+                                Message = "Current password is required to change password."
+                            };
+                        }
+
+                        bool currentPasswordValid =
+                            BCrypt.Net.BCrypt.Verify(updateDto.CurrentPassword, user.PasswordHash);
+
+                        if (!currentPasswordValid)
+                        {
+                            return new ApiResponseDTO<UserResponseDTO>
+                            {
+                                Success = false,
+                                Message = "Current password is incorrect."
+                            };
+                        }
                     }
 
                     user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateDto.NewPassword);
