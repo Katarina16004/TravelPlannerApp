@@ -1,41 +1,70 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
+import AdminDashboard from './pages/Admin/Users.jsx';
 
-import { ToastContainer, toast } from 'react-toastify';
+import Navbar from './components/Common/Navbar.jsx';
+import { ToastContainer } from 'react-toastify';
 
 const Home = () => {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
+
     return (
-        <div style={{ padding: '40px', textAlign: 'center' }}>
-            <h1>Welcome, {user?.name}!</h1>
-            <p>Email: {user?.email}</p>
-            <p>Role: <strong>{user?.role}</strong></p>
-            <button onClick={logout} style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                Logout
-            </button>
+        <div style={{ padding: '40px', textAlign: 'center', fontFamily: '"Inter", system-ui, sans-serif' }}>
+            <h1>Welcome to TravelPlanner, {user?.name}! </h1>
+            <p>Your Passport Email: {user?.email}</p>
+            <p>Current Clearance Role: <strong>{user?.role}</strong></p>
         </div>
     );
 };
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = () => {
     const { isAuthenticated } = useAuth();
-    return isAuthenticated ? children : <Navigate to="/login" />;
+    return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+};
+
+const AdminRoute = () => {
+    const { user } = useAuth();
+    return user?.role === 'Admin' ? <Outlet /> : <Navigate to="/" />;
+};
+
+const MainLayout = () => {
+    return (
+        <>
+            <Navbar />
+            <Outlet />
+        </>
+    );
 };
 
 function App() {
     return (
-        
         <Router>
             <Routes>
-                <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+
+                <Route element={<ProtectedRoute />}>
+                    
+                    <Route element={<MainLayout />}>
+                        
+                        <Route path="/" element={<Home />} />
+
+                        <Route element={<AdminRoute />}>
+                            <Route path="/admin" element={<AdminDashboard />} />
+                        </Route>
+
+                    </Route>
+                </Route>
+
                 <Route path="*" element={<Navigate to="/" />} />
+
             </Routes>
-            
+
             <ToastContainer position="top-right" autoClose={2300} />
         </Router>
     );

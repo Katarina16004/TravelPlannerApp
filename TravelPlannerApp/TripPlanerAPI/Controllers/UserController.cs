@@ -124,7 +124,7 @@ namespace TripPlanerAPI.Controllers
 
         // DELETE: api/user/{id}
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             try
