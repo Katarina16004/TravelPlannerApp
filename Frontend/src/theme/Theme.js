@@ -10,7 +10,8 @@ export const travelTheme = {
         muted: '#718096',      
         border: '#E2E8F0',   
         success: '#319795',   
-        danger: '#E53E3E'      
+        danger: '#E53E3E' ,
+        backgroundtwo: '#bedcec' 
     },
     radius: {
         small: '4px',

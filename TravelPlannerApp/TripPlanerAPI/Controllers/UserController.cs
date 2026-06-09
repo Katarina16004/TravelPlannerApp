@@ -31,7 +31,7 @@ namespace TripPlanerAPI.Controllers
 
                 if (!result.Success)
                 {
-                    return NotFound(result);
+                    return BadRequest(result);
                 }
 
                 return Ok(result);
@@ -107,7 +107,7 @@ namespace TripPlanerAPI.Controllers
 
                 if (!result.Success)
                 {
-                    return Forbid();
+                    return BadRequest(result);
                 }
 
                 return Ok(result);
@@ -148,7 +148,7 @@ namespace TripPlanerAPI.Controllers
 
                 if (!result.Success)
                 {
-                    return Forbid();
+                    return BadRequest(result);
                 }
 
                 return Ok(result);

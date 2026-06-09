@@ -63,14 +63,14 @@ const AdminDashboard = () => {
 
     return (
         <div style={{
-            backgroundColor: travelTheme.colors.background,
+            backgroundColor: travelTheme.colors.backgroundtwo,
             minHeight: '100vh',
             padding: '40px',
             fontFamily: travelTheme.font
         }}>
             <div style={{
                 maxWidth: '1000px',
-                margin: '0 auto',
+                margin: '70px auto',
                 backgroundColor: travelTheme.colors.surface,
                 padding: '30px',
                 borderRadius: travelTheme.radius.large,

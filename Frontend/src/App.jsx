@@ -5,6 +5,7 @@ import { useAuth } from './context/AuthContext';
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
 import AdminDashboard from './pages/Admin/Users.jsx';
+import MyProfile from './pages/MyProfile/MyProfile.jsx';
 
 import Navbar from './components/Common/Navbar.jsx';
 import { ToastContainer } from 'react-toastify';
@@ -33,13 +34,12 @@ const AdminRoute = () => {
 
 const MainLayout = () => {
     return (
-        <>
+        <div style={{ paddingTop: '20px' }}>
             <Navbar />
             <Outlet />
-        </>
+        </div>
     );
 };
-
 function App() {
     return (
         <Router>
@@ -54,6 +54,7 @@ function App() {
                         
                         <Route path="/" element={<Home />} />
 
+                        <Route path="/profile" element={<MyProfile />} />
                         <Route element={<AdminRoute />}>
                             <Route path="/admin" element={<AdminDashboard />} />
                         </Route>

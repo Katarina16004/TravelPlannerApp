@@ -17,7 +17,6 @@ const Login = () => {
         try {
             const response = await authService.login(formData.email, formData.password);
             login(response.token, response.role);
-            toast.success('Ready for departure! Welcome back.');
             navigate('/');
         } catch (err) {
             toast.error(err.message || 'Check your credentials.');
