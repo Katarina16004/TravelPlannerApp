@@ -18,9 +18,10 @@ const RegisterForm = ({ onSubmit, loading }) => {
             style={{ fontFamily: travelTheme.font }}
         >
             <InputField
-                label="Full Name"
+                label="Name"
                 type="text"
                 value={name}
+                required
                 onChange={(e) => setName(e.target.value)}
             />
 
@@ -28,6 +29,7 @@ const RegisterForm = ({ onSubmit, loading }) => {
                 label="Email Address"
                 type="email"
                 value={email}
+                required
                 onChange={(e) => setEmail(e.target.value)}
             />
 
@@ -35,6 +37,7 @@ const RegisterForm = ({ onSubmit, loading }) => {
                 label="Password"
                 type="password"
                 value={password}
+                required
                 onChange={(e) => setPassword(e.target.value)}
             />
 

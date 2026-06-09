@@ -17,11 +17,13 @@ const LoginForm = ({ onSubmit, loading }) => {
                 label="Email Address" 
                 type="email" 
                 value={email} 
+                required
                 onChange={(e) => setEmail(e.target.value)} />
             <InputField 
                 label="Password" 
                 type="password" 
                 value={password} 
+                required
                 onChange={(e) => setPassword(e.target.value)} />
             
             <button 
@@ -43,7 +45,7 @@ const LoginForm = ({ onSubmit, loading }) => {
                     boxShadow: '0 4px 12px rgba(26, 54, 93, 0.15)'
                 }}
             >
-                {loading ? 'Preparing your dashboard...' : 'Explore My Trips →'}
+                {loading ? 'Preparing your dashboard...' : 'Log In →'}
             </button>
         </form>
     );

@@ -7,6 +7,7 @@ import { travelTheme } from '../../theme/Theme';
 import UsersTable from '../../components/Admin/UsersTable';
 import Modal from '../../components/Common/Modal';
 import ProfileForm from '../../components/MyProfile/ProfileForm';
+import ConfirmModal from '../../components/Common/ConfirmModal';
 
 const AdminDashboard = () => {
     const { user } = useAuth();
@@ -16,6 +17,9 @@ const AdminDashboard = () => {
 
     const [editingUser, setEditingUser] = useState(null);
     const [updating, setUpdating] = useState(false);
+
+    // NEW: confirm modal state
+    const [confirmDelete, setConfirmDelete] = useState(null);
 
     const loadUsers = async () => {
         try {
@@ -36,15 +40,21 @@ const AdminDashboard = () => {
         loadUsers();
     }, []);
 
-    const handleDeleteClick = async (id, name) => {
-        if (!window.confirm(`Delete user ${name}?`)) return;
+    // CHANGED: open modal instead of window.confirm
+    const handleDeleteClick = (id, name) => {
+        setConfirmDelete({ id, name });
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!confirmDelete) return;
 
         try {
-            const response = await userService.deleteUser(id);
+            const response = await userService.deleteUser(confirmDelete.id);
 
             if (response.success) {
                 toast.success('User deleted.');
-                setUsers(prev => prev.filter(u => u.id !== id));
+                setUsers(prev => prev.filter(u => u.id !== confirmDelete.id));
+                setConfirmDelete(null);
             }
         } catch (err) {
             toast.error(err.message);
@@ -96,7 +106,7 @@ const AdminDashboard = () => {
         );
     }
 
-        return (
+    return (
         <div style={{
             backgroundColor: travelTheme.colors.backgroundtwo,
             minHeight: '100vh',
@@ -151,6 +161,18 @@ const AdminDashboard = () => {
                     />
                 )}
             </Modal>
+
+            <ConfirmModal
+                open={!!confirmDelete}
+                title="Delete User"
+                message={`Are you sure you want to delete ${confirmDelete?.name}?`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                onCancel={() => setConfirmDelete(null)}
+                onConfirm={handleConfirmDelete}
+                loading={false}
+                type="danger"
+            />
         </div>
     );
 };

@@ -10,7 +10,7 @@ export const authService = {
             const response = await apiClient.post('/auth/login', loginDto);
             
             if (response.data && response.data.success) {
-                return response.data; // { success, token, role, errorMessage }
+                return response.data; 
             }
             throw new Error(response.data.errorMessage || "Login failed.");
         } catch (error) {

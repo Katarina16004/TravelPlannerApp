@@ -62,7 +62,7 @@ namespace TripPlanerAPI.Controllers
 
                 if (!result.Success)
                 {
-                    return Unauthorized(result);
+                    return BadRequest(result);
                 }
 
                 return Ok(result);
