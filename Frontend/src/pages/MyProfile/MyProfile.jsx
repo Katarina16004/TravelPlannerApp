@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import ProfileForm from '../../components/MyProfile/ProfileForm';
 import { travelTheme } from '../../theme/Theme';
+import loginBg from '../../assets/travel-bg.jpg'; 
 
 const MyProfile = () => {
     const { user } = useAuth();
@@ -53,39 +54,51 @@ const MyProfile = () => {
     if (loading) {
         return (
             <div style={{
+                backgroundImage: `url(${loginBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 height: '100vh',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                fontFamily: travelTheme.font
+                fontFamily: travelTheme.font,
+                color: 'white',
+                position: 'relative'
             }}>
-                Loading profile...
+                <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    backdropFilter: 'blur(10px)', backgroundColor: 'rgba(26, 54, 93, 0.1)'
+                }} />
+                <h2 style={{ position: 'relative', zIndex: 2 }}>Loading profile...</h2>
             </div>
         );
     }
 
     return (
         <div style={{
+            backgroundImage: `url(${loginBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed', 
             minHeight: '100vh',
-            backgroundColor: travelTheme.colors.backgroundtwo,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             fontFamily: travelTheme.font,
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            boxSizing: 'border-box',
+            padding: '40px 20px'
         }}>
-
             <div style={{
                 position: 'absolute',
-                width: '500px',
-                height: '500px',
-                background: 'radial-gradient(circle, rgba(43,108,176,0.6) 10%, rgba(26,54,93,0.1) 70%)',
-                filter: 'blur(40px)',
-                top: '20%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 0
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backdropFilter: 'blur(10px)', 
+                backgroundColor: 'rgba(26, 54, 93, 0.1)', 
+                zIndex: 1
             }} />
 
             <div style={{
@@ -97,10 +110,10 @@ const MyProfile = () => {
                 boxShadow: travelTheme.shadow,
                 padding: '30px',
                 position: 'relative',
-                zIndex: 1
+                zIndex: 2
             }}>
                 <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-                    <h2>My Profile</h2>
+                    <h2 style={{ color: travelTheme.colors.text, margin: 0 }}>My Profile</h2>
                 </div>
 
                 {profile && (

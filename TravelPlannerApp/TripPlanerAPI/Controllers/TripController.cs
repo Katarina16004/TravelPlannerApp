@@ -27,6 +27,29 @@ namespace TripPlanerAPI.Controllers
             return userIdClaim != null ? Guid.Parse(userIdClaim.Value) : Guid.Empty;
         }
 
+        private string GetUserRoleFromClaims()
+        {
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
+            return roleClaim != null ? roleClaim.Value : string.Empty;
+        }
+
+        // GET: api/trip/admin
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")] 
+        public async Task<IActionResult> GetAllTripsAdmin()
+        {
+            Guid requestingUserId = GetUserIdFromClaims();
+            string requestingUserRole = GetUserRoleFromClaims();
+
+            if (requestingUserId == Guid.Empty || requestingUserRole != "Admin")
+            {
+                return Unauthorized(new ApiResponseDTO<List<TripResponseDTO>> { Success = false, Message = "Unauthorized or invalid role." });
+            }
+
+            var result = await _tripServiceProxy.GetAllTripsAdminAsync(requestingUserId, requestingUserRole);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
         // POST: api/trip
         [HttpPost]
         public async Task<IActionResult> CreateTrip([FromBody] TripCreateDTO createDto)

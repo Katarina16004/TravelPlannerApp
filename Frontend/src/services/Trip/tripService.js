@@ -105,5 +105,19 @@ export const tripService = {
 
             throw new Error(serverError || 'An error occurred while deleting trip.');
         }
+    },
+
+    // GET api/trip/admin
+    getAllTripsAdmin: async () => {
+    try {
+        const response = await apiClient.get('/trip/admin'); 
+        if (response.data && response.data.success) {
+            return response.data; 
+        }
+        throw new Error(response.data.message || "Failed to load all users trips.");
+    } catch (error) {
+        const serverError = error.response?.data?.message || error.message;
+        throw new Error(serverError || "An error occurred while loading all trips.");
     }
+},
 };

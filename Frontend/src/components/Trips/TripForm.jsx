@@ -31,6 +31,7 @@ const TripForm = ({onSubmit,loading,initialData = null}) => {
                 label="Trip Name"
                 type="text"
                 value={name}
+                required
                 onChange={(e) => setName(e.target.value)}
             />
 
@@ -45,6 +46,7 @@ const TripForm = ({onSubmit,loading,initialData = null}) => {
                 label="Start Date"
                 type="date"
                 value={startDate}
+                required
                 onChange={(e) => setStartDate(e.target.value)}
             />
 
@@ -52,6 +54,7 @@ const TripForm = ({onSubmit,loading,initialData = null}) => {
                 label="End Date"
                 type="date"
                 value={endDate}
+                required
                 onChange={(e) => setEndDate(e.target.value)}
             />
 
@@ -59,6 +62,7 @@ const TripForm = ({onSubmit,loading,initialData = null}) => {
                 label="Budget (€)"
                 type="number"
                 value={budget}
+                required
                 onChange={(e) => setBudget(e.target.value)}
             />
 

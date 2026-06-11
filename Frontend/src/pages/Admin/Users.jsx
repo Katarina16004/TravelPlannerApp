@@ -8,6 +8,7 @@ import UsersTable from '../../components/Admin/UsersTable';
 import Modal from '../../components/Common/Modal';
 import ProfileForm from '../../components/MyProfile/ProfileForm';
 import ConfirmModal from '../../components/Common/ConfirmModal';
+import loginBg from '../../assets/travel-bg.jpg'; 
 
 const AdminDashboard = () => {
     const { user } = useAuth();
@@ -18,7 +19,6 @@ const AdminDashboard = () => {
     const [editingUser, setEditingUser] = useState(null);
     const [updating, setUpdating] = useState(false);
 
-    // NEW: confirm modal state
     const [confirmDelete, setConfirmDelete] = useState(null);
 
     const loadUsers = async () => {
@@ -40,7 +40,6 @@ const AdminDashboard = () => {
         loadUsers();
     }, []);
 
-    // CHANGED: open modal instead of window.confirm
     const handleDeleteClick = (id, name) => {
         setConfirmDelete({ id, name });
     };
@@ -100,45 +99,72 @@ const AdminDashboard = () => {
 
     if (loading) {
         return (
-            <div style={{ textAlign: 'center', padding: '50px' }}>
-                <h3>Loading users...</h3>
+            <div style={{ 
+                backgroundImage: `url(${loginBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                minHeight: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontFamily: travelTheme.font,
+                color: 'white'
+            }}>
+                <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    backdropFilter: 'blur(10px)', backgroundColor: 'rgba(26, 54, 93, 0.1)'
+                }} />
+                <h2 style={{ position: 'relative', zIndex: 2 }}>Loading users...</h2>
             </div>
         );
     }
 
     return (
         <div style={{
-            backgroundColor: travelTheme.colors.backgroundtwo,
+            backgroundImage: `url(${loginBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed', 
             minHeight: '100vh',
-            padding: '40px',
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'flex-start', 
+            padding: '60px 20px',
             fontFamily: travelTheme.font,
             position: 'relative',
-            overflow: 'hidden'
+            boxSizing: 'border-box'
         }}>
 
             <div style={{
                 position: 'absolute',
-                width: '90%',
-                height: '60%',
-                background: 'radial-gradient(circle, rgba(43,108,176,0.6) 10%, rgba(26,54,93,0.1) 70%)',
-                filter: 'blur(60px)',
-                top: '10%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 0
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backdropFilter: 'blur(10px)', 
+                backgroundColor: 'rgba(26, 54, 93, 0.1)', 
+                zIndex: 1
             }} />
 
             <div style={{
                 position: 'relative',
-                zIndex: 1,
+                zIndex: 2,
                 maxWidth: '1000px',
-                margin: '70px auto',
+                width: '100%',
+                margin: '30px auto',
                 backgroundColor: travelTheme.colors.surface,
                 padding: '30px',
                 borderRadius: travelTheme.radius.large,
                 boxShadow: travelTheme.shadow
             }}>
-                <h2>User Management Control</h2>
+                <div style={{ marginBottom: '25px' }}>
+                    <h2 style={{ color: travelTheme.colors.text, margin: 0, fontSize: '26px', fontWeight: '700' }}>
+                        User management control
+                    </h2>
+                    <p style={{ color: travelTheme.colors.muted, margin: '5px 0 0 0', fontSize: '14px' }}>
+                        Manage registered accounts and clean up application profiles
+                    </p>
+                </div>
 
                 <UsersTable
                     users={users}

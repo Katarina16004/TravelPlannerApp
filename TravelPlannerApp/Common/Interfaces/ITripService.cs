@@ -11,6 +11,7 @@ namespace Common.Interfaces
         Task<ApiResponseDTO<List<TripResponseDTO>>> GetUserTripsAsync(Guid userId);
         Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId, string? sharingToken);
         Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId);
+        Task<ApiResponseDTO<List<TripResponseDTO>>> GetAllTripsAdminAsync(Guid requestingUserId, string requestingUserRole);
 
     }
 }

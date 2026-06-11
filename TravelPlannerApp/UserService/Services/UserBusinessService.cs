@@ -122,7 +122,7 @@ namespace UserService.Services
                     return new LoginResponseDTO
                     {
                         Success = false,
-                        ErrorMessage = $"Invalid email or password. [Hash: {user.PasswordHash}]"
+                        ErrorMessage = $"Invalid email or password."
                     };
                 }
 

@@ -46,6 +46,13 @@ const Navbar = () => {
                 <Link to="/trips" style={{ color: 'white', textDecoration: 'none', fontSize: '15px', fontWeight: '500' }}>
                     My Trips
                 </Link>
+                {user?.role === 'Admin' && (
+                    <Link to="/admin/trips" style={{ color: 'white', textDecoration: 'none', fontSize: '15px', fontWeight: '500' }}>
+                        All Trips
+                    </Link>
+                )}
+
+
 
                 <button 
                     onClick={handleLogout}

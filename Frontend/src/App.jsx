@@ -5,6 +5,7 @@ import { useAuth } from './context/AuthContext';
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
 import AdminDashboard from './pages/Admin/Users.jsx';
+import AdminTrips from './pages/Admin/Trips.jsx'; 
 import MyProfile from './pages/MyProfile/MyProfile.jsx';
 import Trips from './pages/Trips/Trips.jsx';
 
@@ -35,38 +36,35 @@ const AdminRoute = () => {
 
 const MainLayout = () => {
     return (
-        <div style={{ paddingTop: '20px' }}>
+        <div style={{ paddingTop: '20px' }}> 
             <Navbar />
             <Outlet />
         </div>
     );
 };
+
 function App() {
     return (
         <Router>
             <Routes>
-
+                {/* Javne rute */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
                 <Route element={<ProtectedRoute />}>
-                    
                     <Route element={<MainLayout />}>
                         <Route path="/" element={<Home />} />
-
                         <Route path="/trips" element={<Trips />} />
-
                         <Route path="/profile" element={<MyProfile />} />
 
                         <Route element={<AdminRoute />}>
                             <Route path="/admin" element={<AdminDashboard />} />
+                            <Route path="/admin/trips" element={<AdminTrips />} /> 
                         </Route>
-
                     </Route>
                 </Route>
 
                 <Route path="*" element={<Navigate to="/" />} />
-
             </Routes>
 
             <ToastContainer position="top-right" autoClose={2300} />

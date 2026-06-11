@@ -1,60 +1,54 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { travelTheme } from '../../theme/Theme';
 
-const TripTable = ({ trips }) => {
-    if (trips.length === 0) {
-        return (
-            <p style={{ color: travelTheme.colors.muted }}>
-                No trips found. Start by creating a new adventure!
-            </p>
-        );
-    }
+const TripTable = ({ trips, isAdmin = false }) => {
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        return new Date(dateString).toLocaleDateString();
+    };
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
-            {trips.map((trip) => (
-                <div
-                    key={trip.id}
-                    style={{
-                        border: `1px solid ${travelTheme.colors.border}`,
-                        borderRadius: travelTheme.radius.large,
-                        backgroundColor: travelTheme.colors.surface,
-                        padding: '20px',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px'
-                    }}
-                >
-                    <h3 style={{ margin: '0 0 5px 0', color: travelTheme.colors.text }}>{trip.name}</h3>
-                    <p style={{ margin: 0, color: travelTheme.colors.muted, fontSize: '14px' }}>
-                        {trip.description}
-                    </p>
-                    
-                    <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: travelTheme.colors.text }}>
-                        {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
-                    </p>
-
-                    <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: travelTheme.colors.secondary }}>
-                        Budget: {trip.budget}€
-                    </p>
-
-                    <Link 
-                        to={`/trips/${trip.id}`} 
-                        style={{ 
-                            marginTop: '10px', 
-                            color: travelTheme.colors.primary, 
-                            textDecoration: 'none', 
-                            fontWeight: '600',
-                            fontSize: '14px',
-                            width: 'fit-content'
-                        }}
-                    >
-                        View Details →
-                    </Link>
-                </div>
-            ))}
+        <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontFamily: travelTheme.font }}>
+                <thead>
+                    <tr style={{ borderBottom: `2px solid ${travelTheme.colors.border}`, color: travelTheme.colors.text }}>
+                        {isAdmin && <th style={{ padding: '12px', fontWeight: '600' }}>User ID</th>}
+                        <th style={{ padding: '12px', fontWeight: '600' }}>Trip Name</th>
+                        <th style={{ padding: '12px', fontWeight: '600' }}>Dates</th>
+                        <th style={{ padding: '12px', fontWeight: '600' }}>Budget</th>
+                        <th style={{ padding: '12px', fontWeight: '600' }}>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {trips.length === 0 ? (
+                        <tr>
+                            <td colSpan={isAdmin ? 5 : 4} style={{ padding: '20px', textAlign: 'center', color: travelTheme.colors.muted }}>
+                                No trips found in the system.
+                            </td>
+                        </tr>
+                    ) : (
+                        trips.map((trip) => (
+                            <tr key={trip.id || trip.Id} style={{ borderBottom: `1px solid ${travelTheme.colors.border}`, color: travelTheme.colors.text }}>
+                                {isAdmin && (
+                                    <td style={{ padding: '12px', fontSize: '13px', color: travelTheme.colors.muted, fontFamily: 'monospace' }}>
+                                        {trip.userId || trip.UserId || 'System'}
+                                    </td>
+                                )}
+                                <td style={{ padding: '12px', fontWeight: '500' }}>{trip.name || trip.Name}</td>
+                                <td style={{ padding: '12px' }}>
+                                    {formatDate(trip.startDate || trip.StartDate)} - {formatDate(trip.endDate || trip.EndDate)}
+                                </td>
+                                <td style={{ padding: '12px' }}>${trip.budget ?? trip.Budget}</td>
+                                <td style={{ padding: '12px' }}>
+                                    <button style={{ background: 'none', border: 'none', color: travelTheme.colors.secondary, cursor: 'pointer', fontWeight: '500' }}>
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
         </div>
     );
 };

@@ -97,6 +97,11 @@ namespace TripService
         {
             return _tripBusinessService.DeleteTripAsync(tripId, userId);
         }
+        
+        public Task<ApiResponseDTO<List<TripResponseDTO>>> GetAllTripsAdminAsync(Guid requestingUserId, string requestingUserRole)
+        {
+            return _tripBusinessService.GetAllTripsAdminAsync(requestingUserId, requestingUserRole);
+        }
         #endregion
 
         #region DestinationService Methods

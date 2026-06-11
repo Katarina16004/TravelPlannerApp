@@ -4,7 +4,7 @@ import { travelTheme } from '../../theme/Theme';
 import { toast } from 'react-toastify';
 import Modal from '../../components/Common/Modal'; 
 import TripForm from '../../components/Trips/TripForm';
-import TripTable from '../../components/Trips/TripsTable';
+import TripCards from '../../components/Trips/TripCards';
 import loginBg from '../../assets/travel-bg.jpg'; 
 
 const Trips = () => {
@@ -35,8 +35,12 @@ const Trips = () => {
             toast.error('Trip name is required.');
             return;
         }
-        if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-            toast.error('Start date must be before end date.');
+        if (!formData.startDate.trim()) {
+            toast.error('Start date is required.');
+            return;
+        }
+        if (!formData.endDate.trim()) {
+            toast.error('End date is required.');
             return;
         }
         if (formData.budget < 0) {
@@ -56,7 +60,7 @@ const Trips = () => {
                 formData.note
             );
 
-            toast.success('Trip created successfully ✈️');
+            toast.success('Trip created successfully');
             setIsModalOpen(false); 
             loadTrips();          
         } catch (error) {
@@ -118,24 +122,26 @@ const Trips = () => {
                 maxWidth: '1000px', 
                 width: '100%',
                 marginTop: '30px',
-                padding: '30px',
-                backgroundColor: travelTheme.colors.surface, 
-                border: `1px solid ${travelTheme.colors.border}`, 
-                borderRadius: travelTheme.radius.large, 
-                boxShadow: travelTheme.shadow,
                 position: 'relative', 
                 zIndex: 2 
             }}>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                    <h2 style={{ color: travelTheme.colors.text, margin: 0, fontSize: '26px', fontWeight: '700' }}>
-                        My Trips
-                    </h2>
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    marginBottom: '35px' 
+                }}>
+                    <div>
+                        <h2 style={{ color: '#ffffff', margin: 0, fontSize: '32px', fontWeight: '700', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                            My Trips
+                        </h2>
+                    </div>
 
                     <button 
                         onClick={() => setIsModalOpen(true)}
                         style={{
-                            padding: '12px 24px',
+                            padding: '12px 26px',
                             backgroundColor: travelTheme.colors.primary,
                             color: 'white',
                             border: 'none',
@@ -143,22 +149,22 @@ const Trips = () => {
                             fontWeight: '600',
                             fontSize: '15px',
                             cursor: 'pointer',
-                            boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
                             transition: 'all 0.2s'
                         }}
+                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'}
+                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                     >
                         + Create Trip
                     </button>
                 </div>
-
-                {/* Tabela/Lista sa putovanjima */}
-                <TripTable trips={trips} />
+                
+                <TripCards trips={trips} />
             </div>
 
-            {/* Modal za kreiranje novog putovanja */}
             <Modal 
                 open={isModalOpen} 
-                title="Plan a New Adventure" 
+                title="Plan a new adventure" 
                 onClose={() => setIsModalOpen(false)}
             >
                 <TripForm 

@@ -276,5 +276,37 @@ namespace TripService.Services
                 };
             }
         }
+        public async Task<ApiResponseDTO<List<TripResponseDTO>>> GetAllTripsAdminAsync(Guid requestingUserId, string requestingUserRole)
+        {
+            try
+            {
+                if (requestingUserRole != "Admin")
+                {
+                    return new ApiResponseDTO<List<TripResponseDTO>>
+                    {
+                        Success = false,
+                        Message = "Access denied. Only Admins can fetch all trips."
+                    };
+                }
+
+                var trips = await _context.Trips.ToListAsync();
+                var tripDtos = trips.Select(trip => TripMapper.MapToResponseDto(trip)).ToList();
+
+                return new ApiResponseDTO<List<TripResponseDTO>>
+                {
+                    Success = true,
+                    Data = tripDtos,
+                    Message = "All system trips retrieved successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseDTO<List<TripResponseDTO>>
+                {
+                    Success = false,
+                    Message = $"Error retrieving all trips: {ex.Message}"
+                };
+            }
+        }
     }
 }
