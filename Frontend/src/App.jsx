@@ -12,16 +12,13 @@ import Trips from './pages/Trips/Trips.jsx';
 import Navbar from './components/Common/Navbar.jsx';
 import { ToastContainer } from 'react-toastify';
 
-const Home = () => {
+const DashboardRedirect = () => {
     const { user } = useAuth();
-
-    return (
-        <div style={{ padding: '40px', textAlign: 'center', fontFamily: '"Inter", system-ui, sans-serif' }}>
-            <h1>Welcome to TravelPlanner, {user?.name}! </h1>
-            <p>Your Passport Email: {user?.email}</p>
-            <p>Current Clearance Role: <strong>{user?.role}</strong></p>
-        </div>
-    );
+    
+    if (user?.role === 'Admin') {
+        return <Navigate to="/admin/trips" replace />;
+    }
+    return <Navigate to="/trips" replace />;
 };
 
 const ProtectedRoute = () => {
@@ -53,7 +50,8 @@ function App() {
 
                 <Route element={<ProtectedRoute />}>
                     <Route element={<MainLayout />}>
-                        <Route path="/" element={<Home />} />
+                        <Route path="/" element={<DashboardRedirect />} />
+                        
                         <Route path="/trips" element={<Trips />} />
                         <Route path="/profile" element={<MyProfile />} />
 
