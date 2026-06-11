@@ -6,6 +6,7 @@ import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
 import AdminDashboard from './pages/Admin/Users.jsx';
 import MyProfile from './pages/MyProfile/MyProfile.jsx';
+import Trips from './pages/Trips/Trips.jsx';
 
 import Navbar from './components/Common/Navbar.jsx';
 import { ToastContainer } from 'react-toastify';
@@ -51,10 +52,12 @@ function App() {
                 <Route element={<ProtectedRoute />}>
                     
                     <Route element={<MainLayout />}>
-                        
                         <Route path="/" element={<Home />} />
 
+                        <Route path="/trips" element={<Trips />} />
+
                         <Route path="/profile" element={<MyProfile />} />
+
                         <Route element={<AdminRoute />}>
                             <Route path="/admin" element={<AdminDashboard />} />
                         </Route>

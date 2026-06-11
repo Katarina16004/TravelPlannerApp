@@ -43,6 +43,9 @@ const Navbar = () => {
                         Users
                     </Link>
                 )}
+                <Link to="/trips" style={{ color: 'white', textDecoration: 'none', fontSize: '15px', fontWeight: '500' }}>
+                    My Trips
+                </Link>
 
                 <button 
                     onClick={handleLogout}

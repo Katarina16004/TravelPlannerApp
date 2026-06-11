@@ -1,0 +1,174 @@
+import React, { useEffect, useState } from 'react';
+import { tripService } from '../../services/Trip/tripService';
+import { travelTheme } from '../../theme/Theme';
+import { toast } from 'react-toastify';
+import Modal from '../../components/Common/Modal'; 
+import TripForm from '../../components/Trips/TripForm';
+import TripTable from '../../components/Trips/TripsTable';
+import loginBg from '../../assets/travel-bg.jpg'; 
+
+const Trips = () => {
+    const [trips, setTrips] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [createLoading, setCreateLoading] = useState(false);
+
+    useEffect(() => {
+        loadTrips();
+    }, []);
+
+    const loadTrips = async () => {
+        try {
+            setLoading(true);
+            const response = await tripService.getUserTrips();
+            setTrips(response.data);
+        } catch (error) {
+            console.error(error);
+            toast.error('Failed to load trips.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateTripSubmit = async (formData) => {
+        if (!formData.name.trim()) {
+            toast.error('Trip name is required.');
+            return;
+        }
+        if (new Date(formData.startDate) >= new Date(formData.endDate)) {
+            toast.error('Start date must be before end date.');
+            return;
+        }
+        if (formData.budget < 0) {
+            toast.error('Budget cannot be negative.');
+            return;
+        }
+
+        try {
+            setCreateLoading(true);
+
+            await tripService.createTrip(
+                formData.name, 
+                formData.description, 
+                formData.startDate, 
+                formData.endDate, 
+                formData.budget, 
+                formData.note
+            );
+
+            toast.success('Trip created successfully ✈️');
+            setIsModalOpen(false); 
+            loadTrips();          
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setCreateLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div style={{ 
+                backgroundImage: `url(${loginBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                minHeight: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontFamily: travelTheme.font,
+                color: 'white'
+            }}>
+                <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    backdropFilter: 'blur(10px)', backgroundColor: 'rgba(26, 54, 93, 0.1)'
+                }} />
+                <h2 style={{ position: 'relative', zIndex: 2 }}>Loading trips...</h2>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ 
+            backgroundImage: `url(${loginBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed', 
+            minHeight: '100vh', 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'flex-start', 
+            padding: '60px 20px',
+            fontFamily: travelTheme.font,
+            position: 'relative',
+            boxSizing: 'border-box'
+        }}>
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backdropFilter: 'blur(10px)', 
+                backgroundColor: 'rgba(26, 54, 93, 0.1)', 
+                zIndex: 1
+            }} />
+
+            <div style={{ 
+                maxWidth: '1000px', 
+                width: '100%',
+                marginTop: '30px',
+                padding: '30px',
+                backgroundColor: travelTheme.colors.surface, 
+                border: `1px solid ${travelTheme.colors.border}`, 
+                borderRadius: travelTheme.radius.large, 
+                boxShadow: travelTheme.shadow,
+                position: 'relative', 
+                zIndex: 2 
+            }}>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+                    <h2 style={{ color: travelTheme.colors.text, margin: 0, fontSize: '26px', fontWeight: '700' }}>
+                        My Trips
+                    </h2>
+
+                    <button 
+                        onClick={() => setIsModalOpen(true)}
+                        style={{
+                            padding: '12px 24px',
+                            backgroundColor: travelTheme.colors.primary,
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: travelTheme.radius.regular,
+                            fontWeight: '600',
+                            fontSize: '15px',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        + Create Trip
+                    </button>
+                </div>
+
+                {/* Tabela/Lista sa putovanjima */}
+                <TripTable trips={trips} />
+            </div>
+
+            {/* Modal za kreiranje novog putovanja */}
+            <Modal 
+                open={isModalOpen} 
+                title="Plan a New Adventure" 
+                onClose={() => setIsModalOpen(false)}
+            >
+                <TripForm 
+                    onSubmit={handleCreateTripSubmit} 
+                    loading={createLoading} 
+                />
+            </Modal>
+            
+        </div>
+    );
+};
+
+export default Trips;
