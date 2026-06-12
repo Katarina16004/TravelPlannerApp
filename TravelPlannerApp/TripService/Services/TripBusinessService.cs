@@ -156,7 +156,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId, string? token)
+        public async Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId, string? token, string requestingUserRole)
         {
             try
             {
@@ -164,45 +164,32 @@ namespace TripService.Services
 
                 if (trip == null)
                 {
-                    return new ApiResponseDTO<TripResponseDTO>
-                    {
-                        Success = false,
-                        Message = "Trip not found."
-                    };
+                    return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Trip not found." };
                 }
 
-                if (trip.UserId != userId)
+                if (requestingUserRole != "Admin")
                 {
-                    var accessType = await _tripShareService.GetAccessTypeAsync(token);
-                    if (accessType != ShareAccessType.Edit)
-                        return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Access denied. Edit permission required." };
+                    if (trip.UserId != userId)
+                    {
+                        var accessType = await _tripShareService.GetAccessTypeAsync(token);
+                        if (accessType != ShareAccessType.Edit)
+                            return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Access denied. Edit permission required." };
+                    }
                 }
 
                 if (string.IsNullOrWhiteSpace(updateDto.Name))
                 {
-                    return new ApiResponseDTO<TripResponseDTO>
-                    {
-                        Success = false,
-                        Message = "Trip name is required."
-                    };
+                    return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Trip name is required." };
                 }
 
                 if (updateDto.StartDate >= updateDto.EndDate)
                 {
-                    return new ApiResponseDTO<TripResponseDTO>
-                    {
-                        Success = false,
-                        Message = "Start date must be before end date."
-                    };
+                    return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Start date must be before end date." };
                 }
 
                 if (updateDto.Budget < 0)
                 {
-                    return new ApiResponseDTO<TripResponseDTO>
-                    {
-                        Success = false,
-                        Message = "Budget cannot be negative."
-                    };
+                    return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Budget cannot be negative." };
                 }
 
                 trip.Name = updateDto.Name;
@@ -226,14 +213,10 @@ namespace TripService.Services
             }
             catch (Exception ex)
             {
-                return new ApiResponseDTO<TripResponseDTO>
-                {
-                    Success = false,
-                    Message = $"Error updating trip: {ex.Message}"
-                };
+                return new ApiResponseDTO<TripResponseDTO> { Success = false, Message = $"Error updating trip: {ex.Message}" };
             }
         }
-        public async Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId)
+        public async Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId, string requestingUserRole)
         {
             try
             {
@@ -241,14 +224,10 @@ namespace TripService.Services
 
                 if (trip == null)
                 {
-                    return new ApiResponseDTO<bool>
-                    {
-                        Success = false,
-                        Message = "Trip not found."
-                    };
+                    return new ApiResponseDTO<bool> { Success = false, Message = "Trip not found." };
                 }
 
-                if (trip.UserId != userId)
+                if (requestingUserRole != "Admin" && trip.UserId != userId)
                 {
                     return new ApiResponseDTO<bool>
                     {
@@ -269,11 +248,7 @@ namespace TripService.Services
             }
             catch (Exception ex)
             {
-                return new ApiResponseDTO<bool>
-                {
-                    Success = false,
-                    Message = $"Error deleting trip: {ex.Message}"
-                };
+                return new ApiResponseDTO<bool> { Success = false, Message = $"Error deleting trip: {ex.Message}" };
             }
         }
         public async Task<ApiResponseDTO<List<TripResponseDTO>>> GetAllTripsAdminAsync(Guid requestingUserId, string requestingUserRole)

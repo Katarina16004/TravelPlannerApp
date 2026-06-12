@@ -88,14 +88,14 @@ namespace TripService
             return _tripBusinessService.GetUserTripsAsync(userId);
         }
 
-        public Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId, string? sharingToken)
+        public Task<ApiResponseDTO<TripResponseDTO>> UpdateTripAsync(Guid tripId, TripUpdateDTO updateDto, Guid userId, string? sharingToken, string requestingUserRole)
         {
-            return _tripBusinessService.UpdateTripAsync(tripId, updateDto, userId, sharingToken);
+            return _tripBusinessService.UpdateTripAsync(tripId, updateDto, userId, sharingToken, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId)
+        public Task<ApiResponseDTO<bool>> DeleteTripAsync(Guid tripId, Guid userId, string requestingUserRole)
         {
-            return _tripBusinessService.DeleteTripAsync(tripId, userId);
+            return _tripBusinessService.DeleteTripAsync(tripId, userId, requestingUserRole);
         }
         
         public Task<ApiResponseDTO<List<TripResponseDTO>>> GetAllTripsAdminAsync(Guid requestingUserId, string requestingUserRole)

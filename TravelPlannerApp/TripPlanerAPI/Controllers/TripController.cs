@@ -89,10 +89,12 @@ namespace TripPlanerAPI.Controllers
         public async Task<IActionResult> UpdateTrip(Guid id, [FromBody] TripUpdateDTO updateDto, [FromQuery] string? token = null)
         {
             Guid userId = GetUserIdFromClaims();
-            if (userId == Guid.Empty && string.IsNullOrEmpty(token))
+            string requestingUserRole = GetUserRoleFromClaims();
+
+            if (requestingUserRole != "Admin" && userId == Guid.Empty && string.IsNullOrEmpty(token))
                 return Unauthorized(new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Authentication required." });
 
-            var result = await _tripServiceProxy.UpdateTripAsync(id, updateDto, userId, token);
+            var result = await _tripServiceProxy.UpdateTripAsync(id, updateDto, userId, token, requestingUserRole);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
@@ -101,9 +103,11 @@ namespace TripPlanerAPI.Controllers
         public async Task<IActionResult> DeleteTrip(Guid id)
         {
             Guid userId = GetUserIdFromClaims();
-            if (userId == Guid.Empty) return Unauthorized(new ApiResponseDTO<bool> { Success = false, Message = "Invalid token." });
+            string requestingUserRole = GetUserRoleFromClaims();
+            if (requestingUserRole != "Admin" && userId == Guid.Empty)
+                return Unauthorized(new ApiResponseDTO<bool> { Success = false, Message = "Authentication required." });
 
-            var result = await _tripServiceProxy.DeleteTripAsync(id, userId);
+            var result = await _tripServiceProxy.DeleteTripAsync(id, userId, requestingUserRole);
             return result.Success ? Ok(result) : BadRequest(result);
         }
     }
