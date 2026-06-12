@@ -20,7 +20,7 @@ namespace TripService.Services
             _tripShareService = tripShareService;
         }
 
-        public async Task<ApiResponseDTO<DestinationResponseDTO>> AddDestinationAsync(Guid tripId, Guid userId, string? token, DestinationCreateDTO createDto)
+        public async Task<ApiResponseDTO<DestinationResponseDTO>> AddDestinationAsync(Guid tripId, Guid userId, string? token, DestinationCreateDTO createDto, string requestingUserRole)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace TripService.Services
                     return new ApiResponseDTO<DestinationResponseDTO> { Success = false, Message = "Trip not found." };
                 }
 
-                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit))
+                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit) && requestingUserRole != "Admin")
                     return new ApiResponseDTO<DestinationResponseDTO> { Success = false, Message = "Access denied." };
 
                 if (createDto.ArrivalDate >= createDto.DepartureDate)

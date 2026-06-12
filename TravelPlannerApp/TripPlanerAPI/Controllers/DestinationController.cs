@@ -28,7 +28,12 @@ namespace TripPlanerAPI.Controllers
                 if (userIdClaim == null) return Unauthorized();
 
                 Guid userId = Guid.Parse(userIdClaim.Value);
-                var result = await _destinationServiceProxy.AddDestinationAsync(tripId, userId, token, createDto);
+                var roleClaim = User.FindFirst(ClaimTypes.Role);
+                if (roleClaim == null)
+                    return Unauthorized();
+
+                string role = roleClaim.Value;
+                var result = await _destinationServiceProxy.AddDestinationAsync(tripId, userId, token, createDto, role);
 
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);

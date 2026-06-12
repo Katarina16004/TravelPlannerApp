@@ -105,9 +105,9 @@ namespace TripService
         #endregion
 
         #region DestinationService Methods
-        public Task<ApiResponseDTO<DestinationResponseDTO>> AddDestinationAsync(Guid tripId, Guid userId, string? sharingToken, DestinationCreateDTO createDto)
+        public Task<ApiResponseDTO<DestinationResponseDTO>> AddDestinationAsync(Guid tripId, Guid userId, string? sharingToken, DestinationCreateDTO createDto, string requestingUserRole)
         {
-            return _destinationBusinessService.AddDestinationAsync(tripId, userId, sharingToken, createDto);
+            return _destinationBusinessService.AddDestinationAsync(tripId, userId, sharingToken, createDto, requestingUserRole);
         }
 
         public Task<ApiResponseDTO<List<DestinationResponseDTO>>> GetTripDestinationsAsync(Guid tripId, Guid userId, string? sharingToken, string requestingUserRole)
