@@ -1,7 +1,8 @@
 import React from 'react';
 import { travelTheme } from '../../../theme/Theme';
 
-const DestinationList = ({ destinations, onEdit, onDelete }) => {
+const DestinationList = ({ destinations, onEdit, onDelete, onViewActivities }) => {
+
     const formatDate = (dateString) => {
         if (!dateString) return '';
         return new Date(dateString).toLocaleDateString();
@@ -47,6 +48,20 @@ const DestinationList = ({ destinations, onEdit, onDelete }) => {
                                 </p>
                             )}
                         </div>
+
+                        <button
+                            onClick={() => onViewActivities?.(dest)}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: travelTheme.colors.secondary,
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                fontSize: '14px'
+                            }}
+                        >
+                            Activities
+                        </button>
 
                         <div style={{ display: 'flex', gap: '10px' }}>
                             <button

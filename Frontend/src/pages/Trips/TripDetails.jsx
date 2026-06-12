@@ -8,6 +8,7 @@ import Modal from '../../components/Common/Modal';
 import ConfirmModal from '../../components/Common/ConfirmModal';
 import DestinationForm from '../../components/Trips/Destinations/DestinationForm';
 import DestinationList from '../../components/Trips/Destinations/DestinationList';
+import ActivitiesView from '../../components/Trips/Activities/ActivitiesView';
 
 import loginBg from '../../assets/travel-bg.jpg';
 
@@ -26,6 +27,7 @@ const TripDetails = () => {
     const [editingDestination, setEditingDestination] = useState(null);
 
     const [confirmDelete, setConfirmDelete] = useState(null);
+    const [selectedDestination, setSelectedDestination] = useState(null);
 
     useEffect(() => {
         if (tripId) {
@@ -44,6 +46,11 @@ const TripDetails = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleViewActivities = (dest) => {
+        setSelectedDestination(dest);
+        setActiveTab('activities'); 
     };
 
     const handleFormSubmit = async (formData) => {
@@ -110,9 +117,7 @@ const TripDetails = () => {
 
         try {
             const id = confirmDelete.id || confirmDelete.Id;
-
             await destinationService.deleteDestination(id, token);
-
             toast.success('Destination deleted.');
             setConfirmDelete(null);
             loadDestinations();
@@ -171,12 +176,10 @@ const TripDetails = () => {
                 zIndex: 2
             }}>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                    <button onClick={() => setActiveTab('destinations')} style={tabStyle('destinations')}>
+                    <button onClick={() => { setSelectedDestination(null); setActiveTab('destinations'); }} style={tabStyle('destinations')}>
                         Destinations
                     </button>
-                    <button onClick={() => setActiveTab('activities')} style={tabStyle('activities')}>
-                        Activities
-                    </button>
+                    {/* Sakriven opšti tab "Activities" jer se pristupa samo unutar pojedinačne destinacije */}
                     <button onClick={() => setActiveTab('checklist')} style={tabStyle('checklist')}>
                         Checklist
                     </button>
@@ -228,20 +231,44 @@ const TripDetails = () => {
                                 destinations={destinations}
                                 onEdit={openEditModal}
                                 onDelete={handleDeleteClick}
+                                onViewActivities={handleViewActivities}
                             />
                         )}
                     </div>
                 )}
-
-                {activeTab !== 'destinations' && (
+                
+                {activeTab === 'activities' && selectedDestination && (
                     <div style={{
                         backgroundColor: travelTheme.colors.surface,
                         borderRadius: travelTheme.radius.large,
-                        padding: '40px',
-                        textAlign: 'center',
-                        color: travelTheme.colors.muted
+                        border: `1px solid ${travelTheme.colors.border}`,
+                        boxShadow: travelTheme.shadow,
+                        padding: '30px'
                     }}>
-                        Tab <strong>{activeTab.toUpperCase()}</strong> coming soon...
+                        <button 
+                            onClick={() => {
+                                setSelectedDestination(null);
+                                setActiveTab('destinations');
+                            }}
+                            style={{ 
+                                background: 'none', 
+                                border: 'none', 
+                                color: travelTheme.colors.primary, 
+                                cursor: 'pointer', 
+                                padding: '0', 
+                                marginBottom: '20px',
+                                fontWeight: '600',
+                                fontSize: '14px'
+                            }}
+                        >
+                            ← Back to Destinations
+                        </button>
+
+                        <ActivitiesView
+                            destinations={destinations}
+                            selectedDestination={selectedDestination}
+                            token={token}
+                        />
                     </div>
                 )}
             </div>
@@ -274,6 +301,7 @@ const TripDetails = () => {
                 onConfirm={handleConfirmDelete}
                 loading={false}
             />
+
         </div>
     );
 };
