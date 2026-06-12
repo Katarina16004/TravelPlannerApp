@@ -180,12 +180,13 @@ const TripDetails = () => {
                     <button onClick={() => { setSelectedDestination(null); setActiveTab('destinations'); }} style={tabStyle('destinations')}>
                         Destinations
                     </button>
-                    {/* Sakriven opšti tab "Activities" jer se pristupa samo unutar pojedinačne destinacije */}
-                    <button onClick={() => setActiveTab('checklist')} style={tabStyle('checklist')}>
-                        Checklist
-                    </button>
+                    
                     <button onClick={() => setActiveTab('expenses')} style={tabStyle('expenses')}>
                         Expenses
+                    </button>
+
+                    <button onClick={() => setActiveTab('checklist')} style={tabStyle('checklist')}>
+                        Checklist
                     </button>
                 </div>
 
