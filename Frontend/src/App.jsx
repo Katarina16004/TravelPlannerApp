@@ -8,6 +8,7 @@ import AdminDashboard from './pages/Admin/Users.jsx';
 import AdminTrips from './pages/Admin/Trips.jsx'; 
 import MyProfile from './pages/MyProfile/MyProfile.jsx';
 import Trips from './pages/Trips/Trips.jsx';
+import TripDetails from './pages/Trips/TripDetails.jsx';
 
 import Navbar from './components/Common/Navbar.jsx';
 import { ToastContainer } from 'react-toastify';
@@ -44,7 +45,6 @@ function App() {
     return (
         <Router>
             <Routes>
-                {/* Javne rute */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
@@ -54,6 +54,7 @@ function App() {
                         
                         <Route path="/trips" element={<Trips />} />
                         <Route path="/profile" element={<MyProfile />} />
+                        <Route path="/trips/:tripId" element={<TripDetails />} />
 
                         <Route element={<AdminRoute />}>
                             <Route path="/admin" element={<AdminDashboard />} />
