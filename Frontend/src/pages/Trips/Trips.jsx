@@ -6,13 +6,18 @@ import { toast } from 'react-toastify';
 import Modal from '../../components/Common/Modal';
 import TripForm from '../../components/Trips/TripForm';
 import TripCards from '../../components/Trips/TripCards';
+import ConfirmModal from '../../components/Common/ConfirmModal';
 import loginBg from '../../assets/travel-bg.jpg';
 
 const Trips = () => {
     const [trips, setTrips] = useState([]);
     const [loading, setLoading] = useState(true);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [createLoading, setCreateLoading] = useState(false);
+
+    const [editingTrip, setEditingTrip] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState(null);
 
     const navigate = useNavigate();
 
@@ -26,7 +31,6 @@ const Trips = () => {
             const response = await tripService.getUserTrips();
             setTrips(response.data);
         } catch (error) {
-            console.error(error);
             toast.error('Failed to load trips.');
         } finally {
             setLoading(false);
@@ -38,38 +42,68 @@ const Trips = () => {
         navigate(`/trips/${tripId}`);
     };
 
-    const handleCreateTripSubmit = async (formData) => {
-        if (!formData.name.trim()) {
-            toast.error('Trip name is required.');
-            return;
-        }
-        if (!formData.startDate.trim()) {
-            toast.error('Start date is required.');
-            return;
-        }
-        if (!formData.endDate.trim()) {
-            toast.error('End date is required.');
-            return;
-        }
-        if (formData.budget < 0) {
-            toast.error('Budget cannot be negative.');
-            return;
-        }
+    const handleEditTrip = (trip) => {
+        setEditingTrip(trip);
+        setIsModalOpen(true);
+    };
 
+    const handleDeleteClick = (trip) => {
+        setConfirmDelete(trip);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            const id = confirmDelete.id || confirmDelete.Id;
+
+            await tripService.deleteTrip(id);
+
+            setTrips(prev => prev.filter(t => (t.id || t.Id) !== id));
+            toast.success('Trip deleted');
+
+            setConfirmDelete(null);
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
+    const handleSubmit = async (formData) => {
         try {
             setCreateLoading(true);
 
-            await tripService.createTrip(
-                formData.name,
-                formData.description,
-                formData.startDate,
-                formData.endDate,
-                formData.budget,
-                formData.note
-            );
+            if (editingTrip) {
+                
+                const id = editingTrip.id || editingTrip.Id;
 
-            toast.success('Trip created successfully');
+                await tripService.updateTrip(
+                    id,
+                    formData.name,
+                    formData.description,
+                    formData.startDate,
+                    formData.endDate,
+                    formData.budget,
+                    formData.note
+                );
+
+                toast.success('Trip updated successfully');
+            } else {
+                if(!formData.name || !formData.startDate || !formData.endDate || !formData.budget) {
+                    toast.error('Please fill in all required fields (name, start date, end date, budget).');
+                    return;
+                }
+                await tripService.createTrip(
+                    formData.name,
+                    formData.description,
+                    formData.startDate,
+                    formData.endDate,
+                    formData.budget,
+                    formData.note
+                );
+
+                toast.success('Trip created successfully');
+            }
+
             setIsModalOpen(false);
+            setEditingTrip(null);
             loadTrips();
         } catch (error) {
             toast.error(error.message);
@@ -117,8 +151,7 @@ const Trips = () => {
             alignItems: 'flex-start',
             padding: '60px 20px',
             fontFamily: travelTheme.font,
-            position: 'relative',
-            boxSizing: 'border-box'
+            position: 'relative'
         }}>
             <div style={{
                 position: 'absolute',
@@ -143,7 +176,6 @@ const Trips = () => {
                 position: 'relative',
                 zIndex: 2
             }}>
-
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -168,7 +200,6 @@ const Trips = () => {
                             border: 'none',
                             borderRadius: travelTheme.radius.regular,
                             fontWeight: '600',
-                            fontSize: '15px',
                             cursor: 'pointer'
                         }}
                     >
@@ -179,19 +210,36 @@ const Trips = () => {
                 <TripCards
                     trips={trips}
                     onView={handleViewTrip}
+                    onEdit={handleEditTrip}
+                    onDelete={handleDeleteClick}
                 />
             </div>
 
             <Modal
                 open={isModalOpen}
-                title="Plan a New Adventure"
-                onClose={() => setIsModalOpen(false)}
+                title={editingTrip ? "Edit Trip" : "Plan a New Adventure"}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setEditingTrip(null);
+                }}
             >
                 <TripForm
-                    onSubmit={handleCreateTripSubmit}
+                    onSubmit={handleSubmit}
                     loading={createLoading}
+                    initialData={editingTrip}
                 />
             </Modal>
+
+            <ConfirmModal
+                open={!!confirmDelete}
+                title="Delete Trip"
+                message={`Are you sure you want to delete ${confirmDelete?.name || confirmDelete?.Name}?`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                onCancel={() => setConfirmDelete(null)}
+                onConfirm={handleConfirmDelete}
+                type="danger"
+            />
         </div>
     );
 };

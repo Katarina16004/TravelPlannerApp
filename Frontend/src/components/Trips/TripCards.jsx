@@ -1,20 +1,18 @@
 import React from 'react';
 import { travelTheme } from '../../theme/Theme';
 
-const TripCards = ({ trips, onView }) => {
+const TripCards = ({ trips, onView, onEdit, onDelete }) => {
     const formatDate = (dateString) => {
         if (!dateString) return '';
         return new Date(dateString).toLocaleDateString();
     };
 
     return (
-        <div
-            style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                gap: '20px'
-            }}
-        >
+        <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '20px'
+        }}>
             {trips.length === 0 ? (
                 <div style={{ color: travelTheme.colors.muted }}>
                     You don't have any trips yet.
@@ -31,8 +29,7 @@ const TripCards = ({ trips, onView }) => {
                             boxShadow: travelTheme.shadow,
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '10px',
-                            transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                            gap: '10px'
                         }}
                     >
                         <h3 style={{ margin: 0, color: travelTheme.colors.text }}>
@@ -48,21 +45,46 @@ const TripCards = ({ trips, onView }) => {
                             ${trip.budget ?? trip.Budget}
                         </div>
 
-                        <button
-                            onClick={() => onView?.(trip)}
-                            style={{
-                                marginTop: '10px',
-                                background: 'none',
-                                border: 'none',
-                                color: travelTheme.colors.primary,
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                textAlign: 'left',
-                                padding: 0
-                            }}
-                        >
-                            View details →
-                        </button>
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+                            <button
+                                onClick={() => onView?.(trip)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: travelTheme.colors.primary,
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                View
+                            </button>
+
+                            <button
+                                onClick={() => onEdit?.(trip)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: travelTheme.colors.secondary,
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                onClick={() => onDelete?.(trip)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: travelTheme.colors.danger,
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 ))
             )}
