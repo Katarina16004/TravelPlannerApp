@@ -36,7 +36,7 @@ namespace TripService.Services
             return false;
         }
 
-        public async Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, string? token, ActivityCreateDTO createDto)
+        public async Task<ApiResponseDTO<ActivityResponseDTO>> AddActivityAsync(Guid destinationId, Guid userId, string? token, ActivityCreateDTO createDto, string requestingUserRole)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace TripService.Services
                     return new ApiResponseDTO<ActivityResponseDTO> { Success = false, Message = "Destination not found." };
                 }
 
-                if (!await HasAccess(destination.Trip, userId, token, ShareAccessType.Edit))
+                if (!await HasAccess(destination.Trip, userId, token, ShareAccessType.Edit) && requestingUserRole != "Admin")
                     return new ApiResponseDTO<ActivityResponseDTO> { Success = false, Message = "Access denied." };
 
                 if (createDto.StartTime >= createDto.EndTime)

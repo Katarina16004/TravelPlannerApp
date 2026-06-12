@@ -3,7 +3,13 @@ import InputField from '../../Common/InputField';
 import { travelTheme } from '../../../theme/Theme';
 import { ActivityStatus } from '../../../enums/activityStatus';
 
-const ActivityForm = ({ onSubmit, loading, initialData = null }) => {
+const ActivityForm = ({
+    onSubmit,
+    loading,
+    initialData = null,
+    onDelete
+}) => {
+
     const [name, setName] = useState(initialData?.name || initialData?.Name || '');
     const [location, setLocation] = useState(initialData?.location || initialData?.Location || '');
     const [description, setDescription] = useState(initialData?.description || initialData?.Description || '');
@@ -33,12 +39,14 @@ const ActivityForm = ({ onSubmit, loading, initialData = null }) => {
     );
 
     const [cost, setCost] = useState(initialData?.cost || initialData?.Cost || 0);
+
     const [status, setStatus] = useState(
         initialData?.status || initialData?.Status || ActivityStatus.Planned
     );
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         onSubmit({
             name,
             location,
@@ -50,10 +58,27 @@ const ActivityForm = ({ onSubmit, loading, initialData = null }) => {
         });
     };
 
-    const gridStyle = {
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-    };
+    const isUnchanged =
+        initialData &&
+        name === (initialData.name || initialData.Name || '') &&
+        location === (initialData.location || initialData.Location || '') &&
+        description === (initialData.description || initialData.Description || '') &&
+        startTime === (
+            initialData.startTime
+                ? formatDateTime(initialData.startTime)
+                : initialData.StartTime
+                ? formatDateTime(initialData.StartTime)
+                : ''
+        ) &&
+        endTime === (
+            initialData.endTime
+                ? formatDateTime(initialData.endTime)
+                : initialData.EndTime
+                ? formatDateTime(initialData.EndTime)
+                : ''
+        ) &&
+        Number(cost) === Number(initialData.cost || initialData.Cost || 0) &&
+        Number(status) === Number(initialData.status || initialData.Status || ActivityStatus.Planned);
 
     return (
         <form
@@ -61,45 +86,65 @@ const ActivityForm = ({ onSubmit, loading, initialData = null }) => {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
+                gap: 12
             }}
         >
-            <InputField label="Activity Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <InputField label="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
-            <InputField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 12
+            }}>
                 <InputField
-                    label="Start Time"
-                    type="datetime-local"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
+                    label="Activity Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                 />
 
                 <InputField
-                    label="End Time"
-                    type="datetime-local"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
+                    label="Location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                 />
             </div>
 
-            <div style={gridStyle}>
-                <InputField
-                    label="Estimated Cost (€)"
-                    type="number"
-                    value={cost}
-                    onChange={(e) => setCost(e.target.value)}
-                />
+            <InputField
+                label="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+            />
 
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label
-                        style={{
-                            fontWeight: 600,
-                            fontSize: '13px',
-                            marginBottom: '2px',
-                            color: travelTheme.colors.text
-                        }}
-                    >
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 12
+            }}>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <InputField
+                        label="Start Time"
+                        type="datetime-local"
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
+                    />
+
+                    <InputField
+                        label="End Time"
+                        type="datetime-local"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                    />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <InputField
+                        label="Estimated Cost (€)"
+                        type="number"
+                        value={cost}
+                        onChange={(e) => setCost(e.target.value)}
+                    />
+
+                    <label style={{ fontWeight: 600, fontSize: 13, marginLeft:10, marginBottom: -2, color: travelTheme.colors.text }}>
                         Status
                     </label>
 
@@ -107,14 +152,13 @@ const ActivityForm = ({ onSubmit, loading, initialData = null }) => {
                         value={status}
                         onChange={(e) => setStatus(Number(e.target.value))}
                         style={{
-                            width: '100%',
-                            height: '40px',
-                            padding: '10px 12px',
+                            height: 42,
                             borderRadius: travelTheme.radius.regular,
                             border: `1px solid ${travelTheme.colors.border}`,
-                            fontSize: '14px',
-                            backgroundColor: travelTheme.colors.surface,
-                            boxSizing: 'border-box'
+                            padding: 8,
+                            background: travelTheme.colors.surface,
+                            marginLeft: 8, 
+                            color: travelTheme.colors.text 
                         }}
                     >
                         <option value={ActivityStatus.Planned}>Planned</option>
@@ -125,27 +169,50 @@ const ActivityForm = ({ onSubmit, loading, initialData = null }) => {
                 </div>
             </div>
 
-            <button
-                type="submit"
-                disabled={loading}
-                style={{
-                    width: '100%',
-                    padding: '14px',
-                    marginTop: '6px',
-                    backgroundColor: travelTheme.colors.primary,
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: travelTheme.radius.regular,
-                    fontWeight: 600,
-                    cursor: loading ? 'not-allowed' : 'pointer'
-                }}
-            >
-                {loading
-                    ? 'Saving...'
-                    : initialData
-                    ? 'Update Activity'
-                    : 'Add Activity'}
-            </button>
+            <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+
+                <button
+                    type="submit"
+                    disabled={loading || isUnchanged}
+                    style={{
+                        flex: 1,
+                        padding: 12,
+                        background: loading || isUnchanged
+                            ? '#aaa'
+                            : travelTheme.colors.primary,
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 6,
+                        fontWeight: 600,
+                        cursor: loading || isUnchanged ? 'not-allowed' : 'pointer'
+                    }}
+                >
+                    {loading
+                        ? 'Saving...'
+                        : initialData
+                        ? 'Update Activity'
+                        : 'Add Activity'}
+                </button>
+
+                {initialData && onDelete && (
+                    <button
+                        type="button"
+                        onClick={onDelete}
+                        style={{
+                            padding: 12,
+                            background: travelTheme.colors.danger,
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 6,
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Delete
+                    </button>
+                )}
+            </div>
+
         </form>
     );
 };

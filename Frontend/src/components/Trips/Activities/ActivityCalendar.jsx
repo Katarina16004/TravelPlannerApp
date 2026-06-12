@@ -1,71 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
 import { getActivityStatusColor } from '../../../enums/activityStatus';
 
-const ActivityCalendar = ({ activities, onEdit, onDelete }) => {
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-    const grouped = activities.reduce((acc, act) => {
-        const date = new Date(act.startTime || act.StartTime).toDateString();
+const localizer = momentLocalizer(moment);
 
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(act);
+const ActivityCalendar = ({ activities, destinationStartDate, onEdit }) => {
+    const [currentDate, setCurrentDate] = useState(new Date());
 
-        return acc;
-    }, {});
+    const events = activities.map(a => ({
+        id: a.id || a.Id,
+        title: a.name || a.Name,
+        start: new Date(a.startTime || a.StartTime),
+        end: new Date(a.endTime || a.EndTime),
+        resource: a 
+    }));
+
+    useEffect(() => {
+        if (destinationStartDate) {
+            setCurrentDate(new Date(destinationStartDate));
+        } else {
+            setCurrentDate(new Date());
+        }
+    }, [destinationStartDate]); 
+
+    const eventStyleGetter = (event) => {
+        const status = event.resource?.status || event.resource?.Status;
+        
+        const backgroundColor = getActivityStatusColor(status);
+
+        return {
+            style: {
+                backgroundColor: backgroundColor,
+                borderRadius: '6px',
+                opacity: 0.9,
+                color: 'white', 
+                border: 'none',
+                display: 'block'
+            }
+        };
+    };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {Object.keys(grouped).length === 0 && (
-                <div style={{ color: '#888' }}>
-                    No activities planned.
-                </div>
-            )}
+        <div style={{ height: '700px', backgroundColor: '#fff', borderRadius: '10px', padding: '10px' }}>
+            <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                views={['month', 'week', 'day']}
+                defaultView="month"
+                popup
+                selectable
+                toolbar={true}
+                date={currentDate} 
+                onNavigate={(newDate) => setCurrentDate(newDate)}
 
-            {Object.entries(grouped).map(([date, acts]) => (
-                <div key={date}>
-                    <h3 style={{ marginBottom: 10 }}>{date}</h3>
+                eventPropGetter={eventStyleGetter}
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {acts.map(a => (
-                            <div
-                                key={a.id || a.Id}
-                                style={{
-                                    borderLeft: `4px solid ${getActivityStatusColor(a.status || a.Status)}`,
-                                    padding: 10,
-                                    background: '#fff',
-                                    borderRadius: 6,
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <div>
-                                    <strong>{a.name || a.Name}</strong>
-                                    <div>{a.location || a.Location}</div>
-                                    <div>
-                                        {new Date(a.startTime || a.StartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                                        {new Date(a.endTime || a.EndTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                    <div>{a.cost || a.Cost} €</div>
-                                </div>
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <button
-                                        onClick={() => onEdit?.(a)}
-                                        style={{ background: 'none', border: 'none', color: '#0275d8', fontWeight: '600', cursor: 'pointer' }}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => onDelete?.(a)}
-                                        style={{ background: 'none', border: 'none', color: '#d9534f', fontWeight: '600', cursor: 'pointer' }}
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ))}
+                onSelectEvent={(event) => {
+                    onEdit?.(event.resource);
+                }}
+                style={{ height: '100%' }}
+            />
         </div>
     );
 };

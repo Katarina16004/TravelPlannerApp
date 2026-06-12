@@ -25,10 +25,12 @@ namespace TripPlanerAPI.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null) return Unauthorized();
+                var roleClaim = User.FindFirst(ClaimTypes.Role);
+                if (userIdClaim == null || roleClaim == null) return Unauthorized();
 
                 Guid userId = Guid.Parse(userIdClaim.Value);
-                var result = await _activityServiceProxy.AddActivityAsync(destinationId, userId, token, createDto);
+                string role = roleClaim.Value;
+                var result = await _activityServiceProxy.AddActivityAsync(destinationId, userId, token, createDto, role);
 
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
