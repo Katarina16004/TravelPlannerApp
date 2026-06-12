@@ -34,7 +34,7 @@ namespace TripService.Services
             return false;
         }
 
-        public async Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, string? token, ExpenseCreateDTO createDto)
+        public async Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, string? token, ExpenseCreateDTO createDto, string requestingUserRole)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace TripService.Services
                     return new ApiResponseDTO<ExpenseResponseDTO> { Success = false, Message = "Trip not found." };
                 }
 
-                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit))
+                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit) && requestingUserRole!="Admin")
                     return new ApiResponseDTO<ExpenseResponseDTO> { Success = false, Message = "Access denied." };
 
                 var expense = new Expense
@@ -111,7 +111,7 @@ namespace TripService.Services
             }
         }
 
-        public async Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId, string? token)
+        public async Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId, string? token, string requestingUserRole)
         {
             try
             {
@@ -124,7 +124,7 @@ namespace TripService.Services
                     return new ApiResponseDTO<BudgetSummaryDTO> { Success = false, Message = "Trip not found." };
                 }
 
-                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit) && !await HasAccess(trip, userId, token, ShareAccessType.View))
+                if (!await HasAccess(trip, userId, token, ShareAccessType.Edit) && !await HasAccess(trip, userId, token, ShareAccessType.View) && requestingUserRole != "Admin")
                 {
                     return new ApiResponseDTO<BudgetSummaryDTO> { Success = false, Message = "Permission denied." };
                 }

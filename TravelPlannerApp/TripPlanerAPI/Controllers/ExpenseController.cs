@@ -25,10 +25,14 @@ namespace TripPlanerAPI.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null) return Unauthorized();
+
+                var roleClaim = User.FindFirst(ClaimTypes.Role);
+                if (userIdClaim == null || roleClaim == null) return Unauthorized();
 
                 Guid userId = Guid.Parse(userIdClaim.Value);
-                var result = await _expenseServiceProxy.AddExpenseAsync(tripId, userId, token, createDto);
+
+                string role = roleClaim.Value;
+                var result = await _expenseServiceProxy.AddExpenseAsync(tripId, userId, token, createDto, role);
 
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);
@@ -69,10 +73,14 @@ namespace TripPlanerAPI.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null) return Unauthorized();
+
+                var roleClaim = User.FindFirst(ClaimTypes.Role);
+                if (userIdClaim == null || roleClaim == null) return Unauthorized();
 
                 Guid userId = Guid.Parse(userIdClaim.Value);
-                var result = await _expenseServiceProxy.GetBudgetSummaryAsync(tripId, userId, token);
+
+                string role = roleClaim.Value;
+                var result = await _expenseServiceProxy.GetBudgetSummaryAsync(tripId, userId, token, role);
 
                 if (!result.Success) return BadRequest(result);
                 return Ok(result);

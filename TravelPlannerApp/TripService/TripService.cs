@@ -149,9 +149,9 @@ namespace TripService
         #endregion
 
         #region ExpenseService Methods
-        public Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, string? sharingToken, ExpenseCreateDTO createDto)
+        public Task<ApiResponseDTO<ExpenseResponseDTO>> AddExpenseAsync(Guid tripId, Guid userId, string? sharingToken, ExpenseCreateDTO createDto, string requestingUserRole)
         {
-            return _expenseBusinessService.AddExpenseAsync(tripId, userId, sharingToken, createDto);
+            return _expenseBusinessService.AddExpenseAsync(tripId, userId, sharingToken, createDto, requestingUserRole);
         }
 
         public Task<ApiResponseDTO<List<ExpenseResponseDTO>>> GetTripExpensesAsync(Guid tripId, Guid userId, string? sharingToken, string requestingUserRole)
@@ -159,9 +159,9 @@ namespace TripService
             return _expenseBusinessService.GetTripExpensesAsync(tripId, userId, sharingToken, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId, string? sharingToken)
+        public Task<ApiResponseDTO<BudgetSummaryDTO>> GetBudgetSummaryAsync(Guid tripId, Guid userId, string? sharingToken, string requestingUserRole)
         {
-            return _expenseBusinessService.GetBudgetSummaryAsync(tripId, userId, sharingToken);
+            return _expenseBusinessService.GetBudgetSummaryAsync(tripId, userId, sharingToken, requestingUserRole);
         }
 
         public Task<ApiResponseDTO<bool>> DeleteExpenseAsync(Guid expenseId, Guid userId, string? sharingToken, string requestingUserRole)
