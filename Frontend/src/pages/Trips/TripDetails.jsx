@@ -10,6 +10,7 @@ import DestinationForm from '../../components/Trips/Destinations/DestinationForm
 import DestinationList from '../../components/Trips/Destinations/DestinationList';
 import ActivitiesView from '../../components/Trips/Activities/ActivitiesView';
 import ExpensesView from '../../components/Trips/Expenses/ExpensesView';
+import ChecklistView from '../../components/Trips/Checklist/ChecklistView';
 
 import loginBg from '../../assets/travel-bg.jpg';
 
@@ -284,6 +285,21 @@ const TripDetails = () => {
                             destinations={destinations}
                             selectedDestination={selectedDestination}
                             token={token}
+                        />
+                    </div>
+                    
+                )}
+                {activeTab === 'checklist' && (
+                    <div style={{
+                        backgroundColor: travelTheme.colors.surface,
+                        borderRadius: travelTheme.radius.large,
+                        border: `1px solid ${travelTheme.colors.border}`,
+                        boxShadow: travelTheme.shadow,
+                        padding: '30px'
+                    }}>
+                        <ChecklistView 
+                            tripId={tripId} 
+                            token={token} 
                         />
                     </div>
                 )}
