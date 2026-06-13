@@ -6,9 +6,9 @@ namespace Common.Interfaces
 {
     public interface IChecklistService:IService
     {
-        Task<ApiResponseDTO<ChecklistResponseDTO>> AddItemAsync(Guid tripId, Guid userId, ChecklistCreateDTO createDto);
-        Task<ApiResponseDTO<List<ChecklistResponseDTO>>> GetTripItemsAsync(Guid tripId, Guid userId);
-        Task<ApiResponseDTO<bool>> ToggleItemAsync(Guid itemId, Guid userId);
-        Task<ApiResponseDTO<bool>> DeleteItemAsync(Guid itemId, Guid userId);
+        Task<ApiResponseDTO<ChecklistResponseDTO>> AddItemAsync(Guid tripId, Guid userId, string? token, ChecklistCreateDTO createDto, string requestingUserRole);
+        Task<ApiResponseDTO<List<ChecklistResponseDTO>>> GetTripItemsAsync(Guid tripId, Guid userId, string? token, string requestingUserRole);
+        Task<ApiResponseDTO<bool>> ToggleItemAsync(Guid itemId, Guid userId, string? token, string requestingUserRole);
+        Task<ApiResponseDTO<bool>> DeleteItemAsync(Guid itemId, Guid userId, string? token, string requestingUserRole);
     }
 }

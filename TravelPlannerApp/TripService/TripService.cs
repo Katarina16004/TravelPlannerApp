@@ -172,24 +172,24 @@ namespace TripService
         #endregion
 
         #region ChecklistService Methods
-        public Task<ApiResponseDTO<ChecklistResponseDTO>> AddItemAsync(Guid tripId, Guid userId, ChecklistCreateDTO createDto)
+        public Task<ApiResponseDTO<ChecklistResponseDTO>> AddItemAsync(Guid tripId, Guid userId, string? token, ChecklistCreateDTO createDto, string requestingUserRole)
         {
-            return _ckecklistBusinessService.AddItemAsync(tripId, userId, createDto);
+            return _ckecklistBusinessService.AddItemAsync(tripId, userId, token, createDto, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<List<ChecklistResponseDTO>>> GetTripItemsAsync(Guid tripId, Guid userId)
+        public Task<ApiResponseDTO<List<ChecklistResponseDTO>>> GetTripItemsAsync(Guid tripId, Guid userId, string? token, string requestingUserRole)
         {
-            return _ckecklistBusinessService.GetTripItemsAsync(tripId, userId);
+            return _ckecklistBusinessService.GetTripItemsAsync(tripId, userId, token, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<bool>> ToggleItemAsync(Guid itemId, Guid userId)
+        public Task<ApiResponseDTO<bool>> ToggleItemAsync(Guid itemId, Guid userId, string? token, string requestingUserRole)
         {
-            return _ckecklistBusinessService.ToggleItemAsync(itemId, userId);
+            return _ckecklistBusinessService.ToggleItemAsync(itemId, userId, token, requestingUserRole);
         }
 
-        public Task<ApiResponseDTO<bool>> DeleteItemAsync(Guid itemId, Guid userId)
+        public Task<ApiResponseDTO<bool>> DeleteItemAsync(Guid itemId, Guid userId, string? token, string requestingUserRole)
         {
-            return _ckecklistBusinessService.DeleteItemAsync(itemId, userId);
+            return _ckecklistBusinessService.DeleteItemAsync(itemId, userId, token, requestingUserRole);
         }
         #endregion
 

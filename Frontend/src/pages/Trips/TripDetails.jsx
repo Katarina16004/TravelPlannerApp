@@ -210,11 +210,9 @@ const TripDetails = () => {
                         Expenses
                     </button>
 
-                    {isOwner && (
                     <button onClick={() => setActiveTab('checklist')} style={tabStyle('checklist')}>
                         Checklist
                     </button>
-                    )}
 
                     {isOwner && (
                         <button onClick={() => setActiveTab('share')} style={tabStyle('share')}>
