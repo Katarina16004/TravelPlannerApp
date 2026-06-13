@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { destinationService } from '../../services/Trip/Destination/destinationService';
+import { tripService } from '../../services/Trip/tripService'; 
 import { travelTheme } from '../../theme/Theme';
 import { toast } from 'react-toastify';
 
@@ -11,6 +12,7 @@ import DestinationList from '../../components/Trips/Destinations/DestinationList
 import ActivitiesView from '../../components/Trips/Activities/ActivitiesView';
 import ExpensesView from '../../components/Trips/Expenses/ExpensesView';
 import ChecklistView from '../../components/Trips/Checklist/ChecklistView';
+import ShareView from '../../components/Trips/TripShare/TripShareView'; 
 
 import DownloadTripPdfButton from '../../components/Trips/DownloadTripPdf'; 
 
@@ -23,6 +25,7 @@ const TripDetails = () => {
 
     const [destinations, setDestinations] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isOwner, setIsOwner] = useState(false); 
 
     const [activeTab, setActiveTab] = useState('destinations');
 
@@ -36,8 +39,27 @@ const TripDetails = () => {
     useEffect(() => {
         if (tripId) {
             loadDestinations();
+            checkIfOwner(); 
         }
     }, [tripId]);
+
+    const checkIfOwner = async () => {
+        if (token) {
+            setIsOwner(false);
+            return;
+        }
+        try {
+            const response = await tripService.getUserTrips();
+            if (response && response.success) {
+                const userTrips = response.data || [];
+                const ownsTrip = userTrips.some(t => (t.id || t.Id) === tripId);
+                setIsOwner(ownsTrip);
+            }
+        } catch (error) {
+            console.error("Greška pri proveri vlasništva:", error);
+            setIsOwner(false);
+        }
+    };
 
     const loadDestinations = async () => {
         try {
@@ -179,7 +201,7 @@ const TripDetails = () => {
                 position: 'relative',
                 zIndex: 2
             }}>
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
                     <button onClick={() => { setSelectedDestination(null); setActiveTab('destinations'); }} style={tabStyle('destinations')}>
                         Destinations
                     </button>
@@ -191,6 +213,12 @@ const TripDetails = () => {
                     <button onClick={() => setActiveTab('checklist')} style={tabStyle('checklist')}>
                         Checklist
                     </button>
+
+                    {isOwner && (
+                        <button onClick={() => setActiveTab('share')} style={tabStyle('share')}>
+                            Share Trip
+                        </button>
+                    )}
 
                     <DownloadTripPdfButton tripId={tripId} token={token} />
                 </div>
@@ -212,7 +240,7 @@ const TripDetails = () => {
                         }}>
                             <h2 style={{ margin: 0, color: travelTheme.colors.text }}>
                                 Trip Destinations
-                            </h2>
+                            </h2> 
 
                             <button
                                 onClick={openCreateModal}
@@ -283,7 +311,7 @@ const TripDetails = () => {
                                 fontSize: '14px'
                             }}
                         >
-                            ← Back to Destinations
+                            &larr; Back to Destinations
                         </button>
 
                         <ActivitiesView
@@ -306,6 +334,18 @@ const TripDetails = () => {
                             tripId={tripId} 
                             token={token} 
                         />
+                    </div>
+                )}
+
+                {activeTab === 'share' && isOwner && (
+                    <div style={{
+                        backgroundColor: travelTheme.colors.surface,
+                        borderRadius: travelTheme.radius.large,
+                        border: `1px solid ${travelTheme.colors.border}`,
+                        boxShadow: travelTheme.shadow,
+                        padding: '30px'
+                    }}>
+                        <ShareView tripId={tripId} />
                     </div>
                 )}
             </div>

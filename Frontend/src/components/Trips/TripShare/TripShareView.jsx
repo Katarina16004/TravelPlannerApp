@@ -1,289 +1,232 @@
 import React, { useState, useEffect } from 'react';
-import { tripShareService } from '../../../services/Trip/TripShare/tripShareService';
-import { toast } from 'react-toastify';
-import ConfirmModal from '../../Common/ConfirmModal';
+import { tripShareService} from '../../../services/Trip/TripShare/tripShareService'; 
 import { travelTheme } from '../../../theme/Theme';
+import { toast } from 'react-toastify';
 
-import {
-    getShareAccessTypeLabel,
-    getShareAccessTypeColor
-} from '../../../enums/shareAccessType';
-import { ShareAccessType } from '../../../enums/shareAccessType';
-
-const TripShareView = ({ tripId, token }) => {
-    const [shares, setShares] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [confirmRevoke, setConfirmRevoke] = useState(null);
-
-    const [accessType, setAccessType] = useState(ShareAccessType.View);
+const ShareView = ({ tripId }) => {
+    const [accessType, setAccessType] = useState(1); 
     const [expiresInDays, setExpiresInDays] = useState(7);
     const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+    
+    const [activeShares, setActiveShares] = useState([]);
+    const [sharesLoading, setSharesLoading] = useState(false);
+    
+    const [latestShare, setLatestShare] = useState(null);
+
+    const loadActiveShares = async () => {
+        try {
+            setSharesLoading(true);
+            const response = await tripShareService.getSharesByTripId(tripId);
+            if (response && response.success) {
+                setActiveShares(response.data || []);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setSharesLoading(false);
+        }
+    };
 
     useEffect(() => {
-        if (tripId) {
-            loadShares();
-        }
+        if (tripId) loadActiveShares();
     }, [tripId]);
 
-    const loadShares = async () => {
+    const handleCreateShare = async (e) => {
+        e.preventDefault();
         try {
             setLoading(true);
-            const res = await tripShareService.getSharesByTripId(tripId, token);
-            setShares(res.data || res.Data || []);
-        } catch (e) {
-            toast.error(e.message || 'Failed to load share links.');
+            if(!email.trim()) {
+                toast.error('Please provide email address.');
+                return;
+            }
+            const response = await tripShareService.createShare(tripId, {
+                accessType: parseInt(accessType),
+                expiresInDays: parseInt(expiresInDays),
+                email: email
+            });
+
+            if (response && response.success) {
+                toast.success('Share link generated successfully!');
+                setLatestShare(response.data); 
+                setEmail('');
+                loadActiveShares(); 
+            }
+        } catch (error) {
+            toast.error(error.message || 'Failed to create share link.');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleCreateShare = async (e) => {
-        e.preventDefault();
+    const handleRevokeShare = async (shareId) => {
         try {
-            setSubmitLoading(true);
-
-            await tripShareService.createShare(
-                tripId,
-                { accessType, expiresInDays, email },
-                token
-            );
-
-            toast.success('Share link generated successfully!');
-            setEmail('');
-            setAccessType(ShareAccessType.View);
-            setExpiresInDays(7);
-
-            loadShares();
-        } catch (e) {
-            toast.error(e.message);
-        } finally {
-            setSubmitLoading(false);
+            const response = await tripShareService.revokeShare(shareId);
+            if (response && response.success) {
+                toast.success('Share access revoked.');
+                if (latestShare && latestShare.id === shareId) {
+                    setLatestShare(null);
+                }
+                loadActiveShares();
+            }
+        } catch (error) {
+            toast.error(error.message || 'Failed to revoke share.');
         }
     };
 
-    const handleRevokeShare = async () => {
-        if (!confirmRevoke) return;
-        try {
-            const id = confirmRevoke.id || confirmRevoke.Id;
-            await tripShareService.revokeShare(id, token);
-
-            toast.success('Access revoked successfully.');
-            setConfirmRevoke(null);
-            loadShares();
-        } catch (e) {
-            toast.error(e.message);
-        }
-    };
-
-    // Zajednički stilovi za input elemente i selekte
-    const inputStyle = {
-        padding: '10px 12px',
-        borderRadius: travelTheme.radius.regular,
-        border: `1px solid ${travelTheme.colors.border}`,
-        backgroundColor: '#fff',
-        fontFamily: travelTheme.font,
-        fontSize: '14px',
-        color: travelTheme.colors.text,
-        outline: 'none',
-        flex: 1,
-        minWidth: '150px'
+    const copyToClipboard = (token) => {
+        const shareUrl = `${window.location.origin}/shared-trip/${token}`;
+        navigator.clipboard.writeText(shareUrl);
+        toast.info('Link copied to clipboard!');
     };
 
     return (
-        <div style={{
-            backgroundColor: travelTheme.colors.surface,
-            borderRadius: travelTheme.radius.large,
-            border: `1px solid ${travelTheme.colors.border}`,
-            boxShadow: travelTheme.shadow,
-            padding: '30px'
-        }}>
-            <h2 style={{ margin: '0 0 25px 0', color: travelTheme.colors.text }}>
-                Share Trip
-            </h2>
-
-            {/* FORM ZA KREIRANJE LINKA */}
-            <form onSubmit={handleCreateShare} style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '12px',
-                alignItems: 'center',
-                marginBottom: '35px',
-                paddingBottom: '25px',
-                borderBottom: `1px solid ${travelTheme.colors.border}`
-            }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: '140px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: travelTheme.colors.muted }}>Access Type</label>
+        <div style={{ color: travelTheme.colors.text }}>
+            <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Share This Trip</h3>
+            
+            <form onSubmit={handleCreateShare} style={{ display: 'grid', gap: '15px', maxWidth: '500px', marginBottom: '30px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <label style={{ fontSize: '14px', fontWeight: '600' }}>Access Type:</label>
                     <select 
                         value={accessType} 
-                        onChange={(e) => setAccessType(Number(e.target.value))}
-                        style={inputStyle}
+                        onChange={(e) => setAccessType(e.target.value)}
+                        style={{ padding: '10px', borderRadius: travelTheme.radius.regular, border: `1px solid ${travelTheme.colors.border}` }}
                     >
-                        <option value={ShareAccessType.View}>View Allowed</option>
-                        <option value={ShareAccessType.Edit}>Edit Allowed</option>
+                        <option value={1}>View Only</option>
+                        <option value={2}>Edit Allowed</option>
                     </select>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: '140px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: travelTheme.colors.muted }}>Expires In</label>
-                    <select 
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <label style={{ fontSize: '14px', fontWeight: '600' }}>Expires In (Days):</label>
+                    <input 
+                        type="number" 
+                        min="1"
                         value={expiresInDays} 
-                        onChange={(e) => setExpiresInDays(Number(e.target.value))}
-                        style={inputStyle}
-                    >
-                        <option value={1}>1 Day</option>
-                        <option value={7}>7 Days</option>
-                        <option value={30}>30 Days</option>
-                    </select>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 2, minWidth: '200px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: travelTheme.colors.muted }}>Invitee Email (Optional)</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="e.g. friend@travel.com"
-                        style={inputStyle}
+                        onChange={(e) => setExpiresInDays(e.target.value)}
+                        style={{ padding: '10px', borderRadius: travelTheme.radius.regular, border: `1px solid ${travelTheme.colors.border}` }}
+                        required
                     />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', paddingTop: '22px' }}>
-                    <button 
-                        disabled={submitLoading}
-                        style={{
-                            padding: '11px 24px',
-                            backgroundColor: travelTheme.colors.primary,
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: travelTheme.radius.regular,
-                            cursor: 'pointer',
-                            fontWeight: '600',
-                            fontSize: '14px',
-                            transition: 'opacity 0.2s',
-                            opacity: submitLoading ? 0.7 : 1
-                        }}
-                    >
-                        {submitLoading ? 'Generating...' : '+ Generate Link'}
-                    </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <label style={{ fontSize: '14px', fontWeight: '600' }}>Invitee Email:</label>
+                    <input 
+                        type="email" 
+                        value={email} 
+                        placeholder="e.g. friend@travel.com"
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={{ padding: '10px', borderRadius: travelTheme.radius.regular, border: `1px solid ${travelTheme.colors.border}` }}
+                    />
                 </div>
+
+                <button 
+                    type="submit" 
+                    disabled={loading}
+                    style={{
+                        padding: '12px',
+                        backgroundColor: travelTheme.colors.primary,
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: travelTheme.radius.regular,
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        marginTop: '10px'
+                    }}
+                >
+                    {loading ? 'Generating...' : 'Generate Share Link'}
+                </button>
             </form>
 
-            {/* LISTA POSTOJEĆIH LINKOVA */}
-            <h3 style={{ margin: '0 0 15px 0', fontSize: '18px', color: travelTheme.colors.text }}>
-                Active Share Links
-            </h3>
-
-            {loading ? (
-                <div style={{ textAlign: 'center', color: travelTheme.colors.muted, padding: '20px 0' }}>
-                    Loading shared access records...
-                </div>
-            ) : shares.length === 0 ? (
-                <div style={{ color: travelTheme.colors.muted, fontStyle: 'italic', padding: '10px 0' }}>
-                    This trip hasn't been shared with anyone yet.
-                </div>
-            ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    {shares.map((share) => {
-                        const id = share.id || share.Id;
-                        const tokenStr = share.token || share.Token;
-                        const url = `${window.location.origin}/trip/${tripId}?token=${tokenStr}`;
-
-                        return (
-                            <div 
-                                key={id} 
-                                style={{ 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    gap: '12px',
-                                    padding: '12px',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                                    borderRadius: travelTheme.radius.regular,
-                                    border: `1px solid ${travelTheme.colors.border}`,
-                                    flexWrap: 'wrap'
-                                }}
-                            >
-                                <div style={{ flex: 1, position: 'relative', minWidth: '250px' }}>
-                                    <input
-                                        readOnly
-                                        value={url}
-                                        title="Click to copy link"
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(url);
-                                            toast.info('Link copied to clipboard!');
-                                        }}
-                                        style={{
-                                            ...inputStyle,
-                                            width: '100%',
-                                            backgroundColor: '#f9f9f9',
-                                            cursor: 'pointer',
-                                            textOverflow: 'ellipsis',
-                                            paddingRight: '60px',
-                                            fontWeight: '500'
-                                        }}
-                                    />
-                                    <span style={{
-                                        position: 'absolute',
-                                        right: '10px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        fontSize: '11px',
-                                        fontWeight: '700',
-                                        color: travelTheme.colors.primary,
-                                        pointerEvents: 'none'
-                                    }}>
-                                        COPY
-                                    </span>
-                                </div>
-
-                                <span style={{
-                                    fontSize: '13px',
-                                    fontWeight: '700',
-                                    padding: '6px 12px',
-                                    borderRadius: '20px',
-                                    backgroundColor: 'rgba(255,255,255,0.8)',
-                                    border: `1px solid ${travelTheme.colors.border}`,
-                                    color: getShareAccessTypeColor ? getShareAccessTypeColor(share.accessType) : '#555',
-                                    minWidth: '80px',
-                                    textAlign: 'center'
-                                }}>
-                                    {getShareAccessTypeLabel ? getShareAccessTypeLabel(share.accessType) : 'Shared'}
-                                </span>
-
-                                <button 
-                                    onClick={() => setConfirmRevoke(share)}
-                                    style={{
-                                        padding: '10px 16px',
-                                        backgroundColor: '#d9534f', // Danger boja u tonu aplikacije
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: travelTheme.radius.regular,
-                                        cursor: 'pointer',
-                                        fontWeight: '600',
-                                        fontSize: '13px'
-                                    }}
-                                >
-                                    Revoke
-                                </button>
-                            </div>
-                        );
-                    })}
+            {latestShare && (
+                <div style={{ 
+                    backgroundColor: 'rgba(92, 184, 92, 0.1)', 
+                    border: '1px solid #5cb85c', 
+                    borderRadius: travelTheme.radius.regular, 
+                    padding: '20px',
+                    marginBottom: '30px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '15px'
+                }}>
+                    <h4 style={{ margin: 0, color: '#5cb85c' }}>Successfully Created Share Link!</h4>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <input 
+                            type="text" 
+                            readOnly 
+                            value={`${window.location.origin}/shared-trip/${latestShare.token}`}
+                            style={{ flex: 1, padding: '10px', borderRadius: travelTheme.radius.regular, border: `1px solid ${travelTheme.colors.border}`, backgroundColor: '#f9f9f9' }}
+                        />
+                        <button 
+                            onClick={() => copyToClipboard(latestShare.token)}
+                            style={{ padding: '10px 15px', backgroundColor: '#5cb85c', color: 'white', border: 'none', borderRadius: travelTheme.radius.regular, cursor: 'pointer' }}
+                        >
+                            Copy
+                        </button>
+                    </div>
+                    {latestShare.qrCodeBase64 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
+                            <p style={{ margin: '0 0 5px 0', fontSize: '13px', fontWeight: '600' }}>Or Scan QR Code:</p>
+                            <img 
+                                src={`data:image/png;base64,${latestShare.qrCodeBase64}`} 
+                                alt="Trip Share QR Code" 
+                                style={{ width: '150px', height: '150px', border: `1px solid ${travelTheme.colors.border}`, borderRadius: travelTheme.radius.regular, padding: '5px', backgroundColor: 'white' }}
+                            />
+                        </div>
+                    )}
                 </div>
             )}
 
-            {/* MODAL ZA POTVRDU UKIDANJA PRISTUPA */}
-            <ConfirmModal
-                open={!!confirmRevoke}
-                title="Revoke Shared Access"
-                message="Are you sure you want to disable this share link? Anyone using it will immediately lose access to this trip."
-                confirmText="Revoke Access"
-                cancelText="Cancel"
-                type="danger"
-                onCancel={() => setConfirmRevoke(null)}
-                onConfirm={handleRevokeShare}
-            />
+            <h4>Active Access History</h4>
+            {sharesLoading ? (
+                <p>Loading share history...</p>
+            ) : activeShares.length === 0 ? (
+                <p style={{ color: travelTheme.colors.muted, fontSize: '14px' }}>This trip hasn't been shared with anyone yet.</p>
+            ) : (
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                        <thead>
+                            <tr style={{ borderBottom: `2px solid ${travelTheme.colors.border}`, textAlign: 'left' }}>
+                                <th style={{ padding: '10px' }}>Type</th>
+                                <th style={{ padding: '10px' }}>Expires At</th>
+                                <th style={{ padding: '10px' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {activeShares.map((share) => (
+                                <tr key={share.id || share.Id} style={{ borderBottom: `1px solid ${travelTheme.colors.border}` }}>
+                                    <td style={{ padding: '10px', fontWeight: '600' }}>
+                                        {(share.accessType === 2 || share.AccessType === 2) ? (
+                                            <span style={{ color: '#f0ad4e' }}>Edit Allowed</span>
+                                        ) : (
+                                            <span style={{ color: '#5cb85c' }}>View Only</span>
+                                        )}
+                                    </td>
+                                    <td style={{ padding: '10px' }}>
+                                        {new Date(share.expiresAt || share.ExpiresAt).toLocaleDateString()}
+                                    </td>
+                                    <td style={{ padding: '10px' }}>
+                                        <button 
+                                            onClick={() => copyToClipboard(share.token || share.Token)}
+                                            style={{ background: 'none', border: 'none', color: travelTheme.colors.primary, cursor: 'pointer', marginRight: '15px', fontWeight: '600' }}
+                                        >
+                                            Link
+                                        </button>
+                                        <button 
+                                            onClick={() => handleRevokeShare(share.id || share.Id)}
+                                            style={{ background: 'none', border: 'none', color: '#d9534f', cursor: 'pointer', fontWeight: '600' }}
+                                        >
+                                            Revoke
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };
 
-export default TripShareView;
+export default ShareView;
