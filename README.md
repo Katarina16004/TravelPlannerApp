@@ -47,13 +47,11 @@ The application is built on top of a highly scalable **Microservices Architectur
 
 ### 1. Initializing the Database Environment
 The databases run inside a containerized MSSQL environment.
-Open the Package Manager Console in Visual Studio, select the target microservice project as your Default Project (and set it as the Startup Project), 
-then run
+Open Package Manager Console in Visual Studio, select the desired microservice project as both the Default Project and Startup Project, then execute:
 
-PowerShell:
-  Update-Database 
+Update-Database
 
--> Applies pre-existing structural migrations directly onto your target database
+This applies all existing Entity Framework Core migrations to the corresponding database.
 ### 2. Running the Infrastructure Backend
 
 Start your Service Fabric Local Cluster Manager (Run as Administrator) and initialize it in either 1-Node or 5-Node layout.
@@ -64,12 +62,14 @@ Set your central Service Fabric Application project (TravelPlannerApp) as your S
 
 ### 3. Running the React Frontend
 
-Navigate into the client-side code folder using your preferred command terminal:
+Open a terminal and navigate to the frontend directory:
 
-Bash: 
-  cd Frontend
-Install all required package references and initiate the active developer web server:
+cd Frontend
 
-Bash:
-  npm install
-  npm run dev
+Install all required dependencies:
+
+npm install
+
+Start the development server:
+
+npm run dev
