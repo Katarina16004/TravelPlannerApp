@@ -12,6 +12,8 @@ import ActivitiesView from '../../components/Trips/Activities/ActivitiesView';
 import ExpensesView from '../../components/Trips/Expenses/ExpensesView';
 import ChecklistView from '../../components/Trips/Checklist/ChecklistView';
 
+import DownloadTripPdfButton from '../../components/Trips/DownloadTripPdf'; 
+
 import loginBg from '../../assets/travel-bg.jpg';
 
 const TripDetails = () => {
@@ -189,7 +191,10 @@ const TripDetails = () => {
                     <button onClick={() => setActiveTab('checklist')} style={tabStyle('checklist')}>
                         Checklist
                     </button>
+
+                    <DownloadTripPdfButton tripId={tripId} token={token} />
                 </div>
+                
 
                 {activeTab === 'destinations' && (
                     <div style={{
