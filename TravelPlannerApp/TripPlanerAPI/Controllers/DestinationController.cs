@@ -45,17 +45,19 @@ namespace TripPlanerAPI.Controllers
         }
 
         [HttpGet("api/trip/{tripId}/destinations")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTripDestinations(Guid tripId, [FromQuery] string? token = null)
         {
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 var roleClaim = User.FindFirst(ClaimTypes.Role);
-                if (userIdClaim == null || roleClaim == null) return Unauthorized();
 
-                Guid userId = Guid.Parse(userIdClaim.Value);
-                string role = roleClaim.Value;
+                Guid userId = userIdClaim != null ? Guid.Parse(userIdClaim.Value) : Guid.Empty;
+                string role = roleClaim != null ? roleClaim.Value : string.Empty;
+
+                if (userId == Guid.Empty && string.IsNullOrEmpty(token))
+                    return Unauthorized(new { Message = "Authentication required or missing share token." });
 
                 var result = await _destinationServiceProxy.GetTripDestinationsAsync(tripId, userId, token, role);
                 if (!result.Success) return BadRequest(result);

@@ -75,7 +75,7 @@ const ShareView = ({ tripId }) => {
     };
 
     const copyToClipboard = (token) => {
-        const shareUrl = `${window.location.origin}/shared-trip/${token}`;
+        const shareUrl = `http://localhost:5173/trips/${tripId}?token=${token}`;
         navigator.clipboard.writeText(shareUrl);
         toast.info('Link copied to clipboard!');
     };

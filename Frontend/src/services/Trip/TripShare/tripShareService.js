@@ -75,7 +75,7 @@ export const tripShareService = {
         }
         return null;
     } catch (error) {
-        console.error("Greška pri veriﬁkaciji tokena:", error);
+        console.error("Error fetching access type:", error);
         return null;
     }
 }

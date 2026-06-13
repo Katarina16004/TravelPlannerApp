@@ -26,9 +26,11 @@ const ExpensesView = ({ tripId, token }) => {
     const loadExpenseData = async () => {
         try {
             setLoading(true);
+            
             const expensesRes = await expenseService.getTripExpenses(tripId, token);
             setExpenses(expensesRes.data || []);
-            
+            await new Promise(resolve => setTimeout(resolve, 300));
+
             const budgetRes = await expenseService.getBudgetSummary(tripId, token);
             setBudgetSummary(budgetRes.data || null);
         } catch (error) {

@@ -56,7 +56,7 @@ const TripDetails = () => {
                 setIsOwner(ownsTrip);
             }
         } catch (error) {
-            console.error("Greška pri proveri vlasništva:", error);
+            console.error("Error checking ownership:", error);
             setIsOwner(false);
         }
     };
@@ -67,7 +67,7 @@ const TripDetails = () => {
             const response = await destinationService.getTripDestinations(tripId, token);
             setDestinations(response.data || []);
         } catch (error) {
-            console.error(error);
+            console.error("Error loading destinations:", error);
             toast.error(error.message || 'Failed to load destinations.');
         } finally {
             setLoading(false);
@@ -210,9 +210,11 @@ const TripDetails = () => {
                         Expenses
                     </button>
 
+                    {isOwner && (
                     <button onClick={() => setActiveTab('checklist')} style={tabStyle('checklist')}>
                         Checklist
                     </button>
+                    )}
 
                     {isOwner && (
                         <button onClick={() => setActiveTab('share')} style={tabStyle('share')}>

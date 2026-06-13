@@ -74,9 +74,11 @@ namespace TripPlanerAPI.Controllers
 
         // GET: api/trip/{id}
         [HttpGet("{id}")]
+        [AllowAnonymous] 
         public async Task<IActionResult> GetTripById(Guid id, [FromQuery] string? token = null)
         {
             Guid userId = GetUserIdFromClaims();
+
             if (userId == Guid.Empty && string.IsNullOrEmpty(token))
                 return Unauthorized(new ApiResponseDTO<TripResponseDTO> { Success = false, Message = "Authentication required." });
 

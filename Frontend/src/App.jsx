@@ -24,7 +24,11 @@ const DashboardRedirect = () => {
 
 const ProtectedRoute = () => {
     const { isAuthenticated } = useAuth();
-    return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+    
+    const queryParams = new URLSearchParams(window.location.search);
+    const hasShareToken = queryParams.has('token');
+
+    return (isAuthenticated || hasShareToken) ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 const AdminRoute = () => {
@@ -33,9 +37,16 @@ const AdminRoute = () => {
 };
 
 const MainLayout = () => {
+    const { isAuthenticated } = useAuth();
+    
+    const queryParams = new URLSearchParams(window.location.search);
+    const hasShareToken = queryParams.has('token');
+
+    const showNavbar = isAuthenticated;
+
     return (
-        <div style={{ paddingTop: '20px' }}> 
-            <Navbar />
+        <div style={{ paddingTop: showNavbar ? '20px' : '0px' }}> 
+            {showNavbar && <Navbar />}
             <Outlet />
         </div>
     );
