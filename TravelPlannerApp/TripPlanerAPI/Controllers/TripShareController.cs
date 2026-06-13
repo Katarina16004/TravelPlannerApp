@@ -96,5 +96,26 @@ namespace TripPlanerAPI.Controllers
                 return StatusCode(500, new { Message = $"Error: {ex.Message}" });
             }
         }
+
+        [HttpGet("api/trip-shares/access-type/{token}")]
+        [AllowAnonymous] 
+        public async Task<IActionResult> GetAccessType(string token)
+        {
+            try
+            {
+                var accessType = await _tripShareServiceProxy.GetAccessTypeAsync(token);
+
+                if (accessType == null)
+                {
+                    return BadRequest(new { Success = false, Message = "Invalid token" });
+                }
+
+                return Ok(new { Success = true, Data = accessType });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"Error: {ex.Message}" });
+            }
+        }
     }
 }
