@@ -29,7 +29,8 @@ const ShareView = ({ tripId }) => {
     };
 
     useEffect(() => {
-        if (tripId) loadActiveShares();
+        if (tripId) 
+            loadActiveShares();
     }, [tripId]);
 
     const handleCreateShare = async (e) => {
@@ -84,7 +85,7 @@ const ShareView = ({ tripId }) => {
         <div style={{ color: travelTheme.colors.text }}>
             <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Share This Trip</h3>
             
-            <form onSubmit={handleCreateShare} style={{ display: 'grid', gap: '15px', maxWidth: '500px', marginBottom: '30px' }}>
+            <form onSubmit={handleCreateShare} style={{ display: 'grid', gap: '15px', maxWidth: '500px', marginBottom: '30px',marginLeft:'20%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <label style={{ fontSize: '14px', fontWeight: '600' }}>Access Type:</label>
                     <select 

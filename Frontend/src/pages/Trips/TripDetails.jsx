@@ -37,10 +37,14 @@ const TripDetails = () => {
     const [selectedDestination, setSelectedDestination] = useState(null);
 
     useEffect(() => {
-        if (tripId) {
-            loadDestinations();
-            checkIfOwner(); 
-        }
+        const initializeData = async () => {
+            if (tripId) {
+                await checkIfOwner(); 
+                await loadDestinations(); 
+            }
+        };
+
+        initializeData();
     }, [tripId]);
 
     const checkIfOwner = async () => {
