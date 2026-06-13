@@ -34,7 +34,7 @@ namespace TripService.Services
 
                 // Generisanje QR koda
                 var qrGenerator = new QRCodeGenerator();
-                var qrCodeData = qrGenerator.CreateQrCode($"https://tvoj-sajt.com/share/{token}", QRCodeGenerator.ECCLevel.Q);
+                var qrCodeData = qrGenerator.CreateQrCode($"http://localhost:5173/trips/{dto.TripId}?token={token}", QRCodeGenerator.ECCLevel.Q);
                 var qrCode = new PngByteQRCode(qrCodeData);
                 var qrCodeImage = qrCode.GetGraphic(20);
                 var base64Qr = Convert.ToBase64String(qrCodeImage);

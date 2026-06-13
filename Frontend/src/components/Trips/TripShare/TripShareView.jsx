@@ -154,7 +154,7 @@ const ShareView = ({ tripId }) => {
                         <input 
                             type="text" 
                             readOnly 
-                            value={`${window.location.origin}/shared-trip/${latestShare.token}`}
+                            value={`http://localhost:5173/trips/${tripId}?token=${latestShare.token}`}
                             style={{ flex: 1, padding: '10px', borderRadius: travelTheme.radius.regular, border: `1px solid ${travelTheme.colors.border}`, backgroundColor: '#f9f9f9' }}
                         />
                         <button 
