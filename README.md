@@ -25,6 +25,7 @@ The application is built on top of a highly scalable **Microservices Architectur
 2. **TripService (Stateless)**
    * Central core managing trip configurations, destinations, calendar-view daily activities, and real-time expense/budget calculation.
    * Triggers asynchronous `EmailEvent` payloads to the `Email` when sharing trip access
+   * Downloading PDF with all informations for the trip
    * **Database:** `TravelPlaner_TripDB` (SQL Server).
 
 4. **EmailService (Stateful)**
