@@ -37,9 +37,9 @@ The application is built on top of a highly scalable **Microservices Architectur
 
 ## 🛠️ Technical Stack
 
-* **Frontend:** React, TypeScript, Tailwind CSS, Axios, React Router, jwt-decode.
+* **Frontend:** React, JavaScript, Axios, React Router, jwt-decode.
 * **Backend Gateway & Framework:** ASP.NET Core WebAPI Gateway, Microsoft Service Fabric, Entity Framework Core.
-* **Databases:** Microsoft SQL Server (Docker Containerized).
+* **Databases:** Microsoft SQL Server.
 
 ---
 
